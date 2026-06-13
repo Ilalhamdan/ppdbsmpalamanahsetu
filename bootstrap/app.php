@@ -3,10 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-// Pastikan aplikasi menggunakan folder /tmp saat berjalan di Vercel
-if (isset($_SERVER['VERCEL_URL'])) {
-    $app->useStoragePath('/tmp/storage');
-}
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
