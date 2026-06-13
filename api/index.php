@@ -1,12 +1,33 @@
 <?php
 
-// 1. Trik Utama: Paksa Laravel merespons dengan JSON murni!
-// Ini akan menghentikan Laravel mencari komponen "view" saat terjadi error.
-$_SERVER['HTTP_ACCEPT'] = 'application/json';
+// 1. Muat sistem autoload dari Composer
+require __DIR__ . '/../vendor/autoload.php';
 
-// 2. Pastikan error level server juga nyala
-ini_set('display_errors', '1');
-error_reporting(E_ALL);
+// 2. Ambil instance dasar aplikasi Laravel
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
-// 3. Eksekusi aplikasi
-require __DIR__ . '/../public/index.php';
+// 3. PAKSA Laravel menggunakan folder /tmp milik Vercel SEBELUM aplikasi dijalankan sepenuhnya
+$app->useStoragePath('/tmp/storage');
+
+// 4. Rakit folder-folder darurat secara otomatis di dalam /tmp
+$storageFolders = [
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/logs'
+];
+
+foreach ($storageFolders as $folder) {
+    if (!is_dir($folder)) {
+        mkdir($folder, 0755, true);
+    }
+}
+
+// 5. Ambil alih Kernel HTTP dan jalankan request secara manual
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);
