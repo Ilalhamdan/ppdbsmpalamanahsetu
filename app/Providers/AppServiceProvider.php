@@ -11,10 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Pastikan folder storage dialihkan ke /tmp hanya saat berjalan di Vercel
-        if (isset($_SERVER['VERCEL_URL'])) {
-            $this->app->useStoragePath('/tmp/storage');
-        }
+        // Kosong
     }
 
     /**
@@ -22,15 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                \Illuminate\Support\Facades\View::composer('*', function ($view) {
-                    $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
-                    $view->with('sys_settings', $settings);
-                });
-            }
-        } catch (\Exception $e) {
-            // Abaikan jika tabel settings belum ada saat migrasi
-        }
+        // KITA MATIKAN SEMENTARA LOGIKA VIEW COMPOSER-NYA
+        // Karena pemanggilan View di sini bentrok dengan siklus booting Vercel.
     }
 }
