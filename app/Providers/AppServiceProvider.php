@@ -11,7 +11,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Pastikan folder storage dialihkan ke /tmp hanya saat berjalan di Vercel
+        if (isset($_SERVER['VERCEL_URL'])) {
+            $this->app->useStoragePath('/tmp/storage');
+        }
     }
 
     /**
