@@ -189,6 +189,11 @@
         [aria-expanded="true"] .transition-transform {
             transform: rotate(180deg);
         }
+
+        /* Fix Bootstrap & Tailwind .collapse conflict */
+        .collapse.show {
+            visibility: visible !important;
+        }
     </style>
 </head>
 
