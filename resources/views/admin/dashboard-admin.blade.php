@@ -669,31 +669,34 @@
             <div class="flex-grow-1" style="margin-left:270px;min-height:100vh;overflow-x:hidden;">
 
                 {{-- TOPBAR --}}
-                <div class="topbar-header d-flex justify-content-between align-items-center px-4 py-3 sticky-top">
-                    {{-- Hamburger button (hanya tampil di mobile) --}}
-                    <button class="hamburger-btn-admin me-2" id="hamburgerBtnAdmin" type="button" onclick="toggleSidebarAdmin()" aria-label="Buka Menu">
-                        <i class="bi bi-list"></i>
-                    </button>
-                    <div>
-                        <h1 class="fw-bold text-dark mb-0" id="currentPageTitle"
-                            style="font-size:19px;color:var(--toska-900) !important;">Dashboard Utama</h1>
-                        <span class="text-muted" style="font-size:11px;font-weight:500;">PPDB SMP AL-AMANAH | Sistem
-                            Terintegrasi</span>
+                <div class="topbar-header d-flex justify-content-between align-items-center px-3 px-md-4 py-3 sticky-top">
+                    <div class="d-flex align-items-center flex-grow-1 text-truncate pe-2">
+                        {{-- Hamburger button (hanya tampil di mobile) --}}
+                        <button class="hamburger-btn-admin me-2" id="hamburgerBtnAdmin" type="button" onclick="toggleSidebarAdmin()" aria-label="Buka Menu">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <div class="text-truncate">
+                            <h1 class="fw-bold text-dark mb-0 text-truncate" id="currentPageTitle"
+                                style="font-size:18px;color:var(--toska-900) !important;">Dashboard Utama</h1>
+                            <span class="text-muted d-none d-md-block" style="font-size:11px;font-weight:500;">PPDB SMP AL-AMANAH | Sistem
+                                Terintegrasi</span>
+                        </div>
                     </div>
-                    <div class="d-flex align-items-center gap-3">
+                    
+                    <div class="d-flex align-items-center gap-2 gap-md-3">
                         <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
                             onclick="if(confirm('Semua sisa data simulasi di browser Anda akan dihapus untuk memulai pengujian dari awal. Lanjutkan?')) { localStorage.clear(); window.location.reload(); }"
-                            style="font-weight:600; border-radius:8px; font-size:11px; padding: 4px 10px;"
+                            style="font-weight:600; border-radius:8px; font-size:11px; padding: 4px 8px;"
                             title="Bersihkan sisa data simulasi di browser">
-                            <i class="bi bi-trash3-fill"></i> Reset Data
+                            <i class="bi bi-trash3-fill"></i> <span class="d-none d-sm-inline">Reset</span>
                         </button>
-                        <div class="btn-icon position-relative" onclick="toggleAdminNotif()">
+                        <div class="btn-icon position-relative" onclick="toggleAdminNotif()" style="width: 34px; height: 34px; font-size: 15px;">
                             <span><i class="bi bi-bell"></i></span>
                             <span id="adminNotifBadge" class="notif-count-badge">0</span>
                         </div>
-                        <div class="d-flex align-items-center gap-3 ps-3 border-start border-light-subtle">
-                            <div class="profile-avatar">AD</div>
-                            <div>
+                        <div class="d-flex align-items-center gap-2 ps-2 ps-md-3 border-start border-light-subtle">
+                            <div class="profile-avatar" style="width: 34px; height: 34px; font-size: 12px;">AD</div>
+                            <div class="d-none d-sm-block">
                                 <h6 class="fw-bold text-dark mb-0" style="font-size:13px;">{{ $siswa->name }}</h6>
                                 <span class="text-muted d-block" style="font-size:10px;font-weight:600;">Panitia
                                     PPDB</span>
@@ -4308,7 +4311,31 @@
             }
         }
     </script>
+    <script>
+        // Responsive Sidebar functions
+        function toggleSidebarAdmin() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlayAdmin');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
 
+        function closeSidebarAdmin() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlayAdmin');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        // Close sidebar automatically on mobile when a menu item is clicked
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if(window.innerWidth <= 768 && !link.id.includes('Dropdown')) {
+                    closeSidebarAdmin();
+                }
+            });
+        });
+    </script>
 
     <style>
         @keyframes fadeInUp {
