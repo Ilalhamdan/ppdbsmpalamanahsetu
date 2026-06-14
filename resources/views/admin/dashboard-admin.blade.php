@@ -410,10 +410,153 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* ===== HAMBURGER BUTTON (hanya mobile) ===== */
+        .hamburger-btn-admin {
+            display: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #f0fdfa;
+            border: 1px solid var(--toska-200, #99f6e4);
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--toska-700);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .hamburger-btn-admin:hover {
+            background: var(--toska-100, #ccfbf1);
+            border-color: var(--toska-400, #2dd4bf);
+        }
+
+        /* ===== SIDEBAR OVERLAY ADMIN ===== */
+        .sidebar-overlay-admin {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1029;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay-admin.active { display: block; }
+
+        /* ===== RESPONSIVE MOBILE ADMIN ===== */
+        @media (max-width: 768px) {
+
+            /* --- Sidebar: overlay mode --- */
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1030;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 6px 0 30px rgba(0, 0, 0, 0.25);
+            }
+
+            /* --- Main content: no left margin --- */
+            .flex-grow-1[style*="margin-left"] {
+                margin-left: 0 !important;
+            }
+
+            /* --- Topbar --- */
+            .topbar-header {
+                padding: 0.6rem 0.85rem;
+                gap: 8px;
+            }
+            .topbar-header h1 {
+                font-size: 14px !important;
+            }
+            .topbar-header .text-muted {
+                display: none;
+            }
+
+            /* --- Tampilkan hamburger --- */
+            .hamburger-btn-admin {
+                display: flex;
+            }
+
+            /* --- Card stats: 2 kolom --- */
+            .row.g-3 > .col-md-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            /* --- Panel konten: padding lebih kecil --- */
+            .p-4 {
+                padding: 0.85rem !important;
+            }
+
+            /* --- Tabel: horizontal scroll --- */
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            /* --- Form grid: vertikal --- */
+            .row > .col-md-4,
+            .row > .col-md-5,
+            .row > .col-md-6,
+            .row > .col-md-8,
+            .row > .col-md-12,
+            .row > .col-lg-5,
+            .row > .col-lg-7 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            /* --- Filter card: stack --- */
+            .card-filter {
+                margin-bottom: 0.5rem;
+            }
+
+            /* --- Notif panel admin: full width --- */
+            .admin-notif-panel {
+                width: calc(100vw - 24px);
+                right: 12px;
+                left: 12px;
+            }
+
+            /* --- Chart canvas: full width --- */
+            #chartJalur {
+                max-width: 100%;
+            }
+
+            /* --- Modal: full width --- */
+            .custom-modal-box {
+                width: 95vw;
+                padding: 18px;
+            }
+
+            /* --- Topbar reset data btn --- */
+            .topbar-header .btn-sm {
+                font-size: 10px !important;
+                padding: 3px 7px !important;
+            }
+        }
+
+        /* ===== TABLET ADMIN (768px - 1024px) ===== */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+            .flex-grow-1[style*="margin-left"] {
+                margin-left: 220px !important;
+            }
+            .row.g-3 > .col-md-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    {{-- Sidebar Overlay (mobile) --}}
+    <div class="sidebar-overlay-admin" id="sidebarOverlayAdmin" onclick="closeSidebarAdmin()"></div>
 
     <div class="container-fluid p-0">
         <div class="d-flex">
@@ -527,6 +670,10 @@
 
                 {{-- TOPBAR --}}
                 <div class="topbar-header d-flex justify-content-between align-items-center px-4 py-3 sticky-top">
+                    {{-- Hamburger button (hanya tampil di mobile) --}}
+                    <button class="hamburger-btn-admin me-2" id="hamburgerBtnAdmin" type="button" onclick="toggleSidebarAdmin()" aria-label="Buka Menu">
+                        <i class="bi bi-list"></i>
+                    </button>
                     <div>
                         <h1 class="fw-bold text-dark mb-0" id="currentPageTitle"
                             style="font-size:19px;color:var(--toska-900) !important;">Dashboard Utama</h1>

@@ -1040,10 +1040,163 @@
         .offcanvas-header .btn-close {
             filter: invert(1);
         }
+
+        /* ===== HAMBURGER BUTTON (hanya mobile) ===== */
+        .hamburger-btn {
+            display: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--body-bg);
+            border: 1px solid var(--border-color);
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .hamburger-btn:hover {
+            background: #ccfbf1;
+            border-color: #0d9488;
+            color: #0d9488;
+        }
+
+        /* ===== SIDEBAR OVERLAY (hanya mobile) ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1039;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* ===== RESPONSIVE MOBILE ===== */
+        @media (max-width: 768px) {
+
+            /* --- Sidebar: overlay mode --- */
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1040;
+                width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 6px 0 30px rgba(0, 0, 0, 0.25);
+            }
+
+            /* --- Main wrapper: full width --- */
+            .main-wrapper {
+                margin-left: 0 !important;
+            }
+
+            /* --- Topbar --- */
+            .topbar {
+                padding: 0 1rem;
+                gap: 8px;
+            }
+            .topbar-title h1 {
+                font-size: 14px;
+            }
+            .topbar-title span {
+                font-size: 10px;
+            }
+
+            /* --- Tampilkan hamburger --- */
+            .hamburger-btn {
+                display: flex;
+            }
+
+            /* --- Page content: kurangi padding --- */
+            .page-content {
+                padding: 1rem 0.85rem;
+            }
+
+            /* --- Welcome banner --- */
+            .welcome-banner {
+                padding: 1.2rem 1rem !important;
+            }
+
+            /* --- Stat cards: 2 kolom di mobile --- */
+            .row.g-3 > [class*="col-lg-3"] {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            /* --- Form grid: tumpuk di mobile --- */
+            .row > [class*="col-md"],
+            .row > [class*="col-lg"] {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            /* --- Notif panel: full width di mobile --- */
+            .notif-panel {
+                width: calc(100vw - 24px);
+                right: 12px;
+                left: 12px;
+            }
+
+            /* --- Tabel scroll horizontal --- */
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            /* --- Card berkas/formulir dark: no horizontal overflow --- */
+            .card[style*="background: linear-gradient"],
+            div[style*="background: linear-gradient(135deg, #0d9488"] {
+                overflow-x: hidden;
+            }
+
+            /* --- Progress step: wrap --- */
+            .progress-steps {
+                gap: 4px;
+            }
+
+            /* --- Jalur cards: 1 kolom --- */
+            .jalur-card {
+                margin-bottom: 8px;
+            }
+
+            /* --- Print area kartu ujian: full width --- */
+            #printAreaKartu {
+                max-width: 100% !important;
+            }
+
+            /* --- Profile info text: sembunyikan nama di HP kecil --- */
+            .profile-info-text {
+                display: none !important;
+            }
+
+            /* --- Topbar breadcrumb: sembunyikan di HP --- */
+            .topbar-title span {
+                display: none;
+            }
+        }
+
+        /* ===== TABLET (768px - 1024px) ===== */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            :root {
+                --sidebar-width: 220px;
+            }
+            .topbar-title h1 {
+                font-size: 15px;
+            }
+            .page-content {
+                padding: 1.2rem 1.25rem;
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    {{-- Sidebar Overlay (mobile) --}}
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebarMobile()"></div>
 
     <script src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="{{ config('midtrans.client_key') }}"></script>
@@ -1116,6 +1269,10 @@
 
         {{-- TOPBAR --}}
         <header class="topbar">
+            {{-- Hamburger button (hanya tampil di mobile) --}}
+            <button class="hamburger-btn" id="hamburgerBtn" type="button" onclick="toggleSidebarMobile()" aria-label="Buka Menu">
+                <i class="bi bi-list"></i>
+            </button>
             <div class="topbar-title">
                 <h1 id="topbarTitle">Dashboard Calon Siswa</h1>
                 <span>
@@ -4635,6 +4792,45 @@
             }
         }
     </style>
+
+    <script>
+        // ===== MOBILE SIDEBAR TOGGLE =====
+        function toggleSidebarMobile() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeSidebarMobile() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Tutup sidebar mobile saat menu diklik
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuItems = document.querySelectorAll('.sidebar-menu-item');
+            menuItems.forEach(function (item) {
+                item.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) {
+                        closeSidebarMobile();
+                    }
+                });
+            });
+
+            // Tutup sidebar saat resize ke desktop
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
+                    closeSidebarMobile();
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
