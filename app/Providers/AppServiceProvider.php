@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL; // <-- Tambahan 1: Panggil facade URL
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // --- Tambahan 2: Paksa HTTPS jika bukan di mode local ---
+        if (env('APP_ENV') !== 'local') {
+            URL::forceScheme('https');
+        }
+        // --------------------------------------------------------
+
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
                 \Illuminate\Support\Facades\View::composer('*', function ($view) {
