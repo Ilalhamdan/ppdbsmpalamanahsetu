@@ -31,11 +31,17 @@ return [
     |
     | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
     |            "postmark", "resend", "log", "array",
-    |            "failover", "roundrobin"
+    |            "failover", "roundrobin", "brevo"
     |
     */
 
     'mailers' => [
+
+        // --- Tambahan Konfigurasi Brevo API ---
+        'brevo' => [
+            'transport' => 'brevo',
+        ],
+        // --------------------------------------
 
         'smtp' => [
             'transport' => 'smtp',
