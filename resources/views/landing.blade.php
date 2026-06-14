@@ -181,97 +181,147 @@
 
     <!-- HEADER / NAVBAR -->
     <header class="bg-white border-bottom shadow-sm sticky-top" style="z-index: 1030;">
-        <nav class="navbar navbar-expand-md navbar-light bg-white py-2 py-md-3">
-            <div class="container-fluid px-3 px-md-5">
-                <!-- School Brand with Premium Islamic Emblem -->
-                <a class="navbar-brand d-flex align-items-center gap-2 gap-md-3 text-decoration-none me-0" href="{{ url('/') }}">
-                    <div class="d-flex align-items-center justify-content-center"
-                        style="width: 40px; height: 40px; min-width: 40px;">
-                        <img src="{{ asset('logo.png') }}" alt="Logo SMP Al-Amanah"
-                            style="width: 40px; height: 40px; object-fit: contain;">
-                    </div>
-                    <div class="d-flex flex-column justify-content-center">
-                        <h1 class="mb-0 fw-extrabold text-dark tracking-wide text-truncate"
-                            style="font-size: 15px; letter-spacing: 0.5px; line-height: 1.2; max-width: 200px;">SMP AL-AMANAH</h1>
-                        <p class="text-teal-primary mb-0 fw-semibold d-none d-sm-block" style="font-size: 9px; letter-spacing: 0.5px;">SEKOLAH BERPRESTASI, BERAKHLAK MULIA</p>
-                        <p class="text-teal-primary mb-0 fw-semibold d-block d-sm-none" style="font-size: 9px; letter-spacing: 0.5px;">BERPRESTASI & BERAKHLAK</p>
-                    </div>
-                </a>
+        <div class="container-fluid px-4 px-md-5 d-flex align-items-center justify-content-between"
+            style="padding-top: 1.1rem; padding-bottom: 1.1rem;">
 
-                <!-- Hamburger Menu Button for Mobile -->
-                <button class="navbar-toggler border-0 shadow-none px-2" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#landingNavbar" aria-controls="landingNavbar" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Navigation Menu & Actions Collapse -->
-                <div class="collapse navbar-collapse mt-3 mt-md-0 bg-white rounded-3 p-3 p-md-0 shadow-sm shadow-md-none" id="landingNavbar">
-                    <!-- Navigation Menu -->
-                    <ul class="navbar-nav mx-auto gap-2 gap-md-4 fw-semibold align-items-md-center mb-4 mb-md-0"
-                        style="font-size: 14.5px; letter-spacing: 0.1px;">
-                        <li class="nav-item">
-                            <a href="{{ url('/') }}"
-                                class="nav-link px-2 px-md-0 {{ Request::is('/') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Home</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a href="#"
-                                class="nav-link px-2 px-md-0 {{ Request::is('profil*') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }} dropdown-toggle"
-                                id="navbarDropdownProfil" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Profil
-                            </a>
-                            <ul class="dropdown-menu border-0 shadow-sm mt-2 rounded-3"
-                                aria-labelledby="navbarDropdownProfil">
-                                <li><a class="dropdown-item px-3 py-2 text-secondary"
-                                        href="{{ url('/profil/sejarah') }}">Sejarah</a></li>
-                                <li><a class="dropdown-item px-3 py-2 text-secondary"
-                                        href="{{ url('/profil/visi-misi') }}">Visi Misi</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('/berita') }}"
-                                class="nav-link px-2 px-md-0 {{ Request::is('berita') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Berita</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('/galeri') }}"
-                                class="nav-link px-2 px-md-0 {{ Request::is('galeri') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Galeri</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('/kontak') }}"
-                                class="nav-link px-2 px-md-0 {{ Request::is('kontak') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Kontak</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a href="#"
-                                class="nav-link px-2 px-md-0 {{ Request::is('ppdb*') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }} dropdown-toggle"
-                                id="navbarDropdownPPDB" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                PPDB
-                            </a>
-                            <ul class="dropdown-menu border-0 shadow-sm mt-2 rounded-3" aria-labelledby="navbarDropdownPPDB">
-                                <li><a class="dropdown-item px-3 py-2 text-secondary"
-                                        href="{{ url('/ppdb/gelombang') }}">Informasi Gelombang</a></li>
-                                <li><a class="dropdown-item px-3 py-2 text-secondary" href="{{ url('/ppdb/jalur') }}">Jalur
-                                        Pendaftaran</a></li>
-                                <li><a class="dropdown-item px-3 py-2 text-secondary" href="{{ url('/ppdb/syarat') }}">Syarat
-                                        &amp; Perlengkapan</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <!-- Call to Actions -->
-                    <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 gap-md-3">
-                        <a href="{{ route('login') }}" class="btn btn-outline-teal rounded-pill fw-semibold text-center mb-2 mb-md-0"
-                            style="padding: 0.55rem 1.45rem; font-size: 13.5px; letter-spacing: 0.1px; border: 1.5px solid var(--teal-primary); color: var(--teal-primary);">
-                            Masuk Akun
-                        </a>
-                        <a href="{{ route('register') }}" class="btn btn-teal rounded-pill fw-semibold shadow-sm text-center"
-                            style="padding: 0.55rem 1.45rem; font-size: 13.5px; letter-spacing: 0.1px; background-color: #0d9488; color: white;">
-                            Registrasi
-                        </a>
-                    </div>
+            <!-- School Brand with Premium Islamic Emblem -->
+            <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 gap-md-3 text-decoration-none">
+                <div class="d-flex align-items-center justify-content-center"
+                    style="width: 48px; height: 48px; min-width: 48px;">
+                    <img src="{{ asset('logo.png') }}" alt="Logo SMP Al-Amanah"
+                        style="width: 48px; height: 48px; object-fit: contain;">
                 </div>
+                <div class="d-flex flex-column justify-content-center">
+                    <h1 class="mb-0 fw-extrabold text-dark tracking-wide text-truncate"
+                        style="font-size: 16px; letter-spacing: 0.6px; line-height: 1.2; max-width: 220px;">SMP AL-AMANAH</h1>
+                    <p class="text-teal-primary mb-0 fw-semibold d-none d-sm-block" style="font-size: 10px; letter-spacing: 1px;">SEKOLAH BERPRESTASI, BERAKHLAK MULIA</p>
+                    <p class="text-teal-primary mb-0 fw-semibold d-block d-sm-none" style="font-size: 10px; letter-spacing: 1px;">BERPRESTASI & BERAKHLAK</p>
+                </div>
+            </a>
+
+            <!-- Mobile Hamburger Button -->
+            <button class="btn d-md-none border-0 bg-transparent p-0" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation" style="box-shadow: none;">
+                <i class="bi bi-list fs-1 text-teal-primary"></i>
+            </button>
+
+            <!-- Navigation Menu (Desktop) -->
+            <ul class="nav d-none d-md-flex align-items-center gap-4 fw-semibold"
+                style="font-size: 14.5px; letter-spacing: 0.1px;">
+                <li class="nav-item">
+                    <a href="{{ url('/') }}"
+                        class="nav-link p-0 {{ Request::is('/') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#"
+                        class="nav-link p-0 {{ Request::is('profil*') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }} dropdown-toggle"
+                        id="navbarDropdownProfil" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Profil
+                    </a>
+                    <ul class="dropdown-menu border-0 shadow-sm mt-2.5 rounded-3"
+                        aria-labelledby="navbarDropdownProfil">
+                        <li><a class="dropdown-item px-3.5 py-2 text-secondary"
+                                href="{{ url('/profil/sejarah') }}">Sejarah</a></li>
+                        <li><a class="dropdown-item px-3.5 py-2 text-secondary"
+                                href="{{ url('/profil/visi-misi') }}">Visi Misi</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/berita') }}"
+                        class="nav-link p-0 {{ Request::is('berita') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Berita</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/galeri') }}"
+                        class="nav-link p-0 {{ Request::is('galeri') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Galeri</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/kontak') }}"
+                        class="nav-link p-0 {{ Request::is('kontak') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }}">Kontak</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#"
+                        class="nav-link p-0 {{ Request::is('ppdb*') ? 'text-teal-primary border-bottom border-2 border-teal-primary pb-1' : 'text-secondary text-teal-hover' }} dropdown-toggle"
+                        id="navbarDropdownPPDB" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        PPDB
+                    </a>
+                    <ul class="dropdown-menu border-0 shadow-sm mt-2.5 rounded-3" aria-labelledby="navbarDropdownPPDB">
+                        <li><a class="dropdown-item px-3.5 py-2 text-secondary"
+                                href="{{ url('/ppdb/gelombang') }}">Informasi Gelombang</a></li>
+                        <li><a class="dropdown-item px-3.5 py-2 text-secondary" href="{{ url('/ppdb/jalur') }}">Jalur
+                                Pendaftaran</a></li>
+                        <li><a class="dropdown-item px-3.5 py-2 text-secondary" href="{{ url('/ppdb/syarat') }}">Syarat
+                                &amp; Perlengkapan</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Call to Actions (Desktop) -->
+            <div class="d-none d-md-flex align-items-center gap-3">
+                <a href="{{ route('login') }}" class="btn btn-outline-teal rounded-pill fw-semibold"
+                    style="padding: 0.55rem 1.45rem; font-size: 13.5px; letter-spacing: 0.1px; border: 1.5px solid var(--teal-primary); color: var(--teal-primary);">
+                    Masuk Akun
+                </a>
+                <a href="{{ route('register') }}" class="btn btn-teal rounded-pill fw-semibold shadow-sm"
+                    style="padding: 0.55rem 1.45rem; font-size: 13.5px; letter-spacing: 0.1px;">
+                    Registrasi
+                </a>
             </div>
-        </nav>
+        </div>
     </header>
+
+    <!-- Offcanvas Mobile Menu -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold text-teal-primary" id="mobileMenuLabel">Menu Utama</h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <!-- Mobile Nav Links -->
+            <ul class="nav flex-column gap-3 fw-semibold mb-4" style="font-size: 15px;">
+                <li class="nav-item">
+                    <a href="{{ url('/') }}" class="nav-link px-0 text-dark {{ Request::is('/') ? 'text-teal-primary fw-bold' : '' }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-0 text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseProfilMobile" role="button" aria-expanded="false" aria-controls="collapseProfilMobile">
+                        Profil <i class="bi bi-chevron-down small"></i>
+                    </a>
+                    <div class="collapse" id="collapseProfilMobile">
+                        <ul class="list-unstyled ms-3 mt-2 mb-0 d-flex flex-column gap-2">
+                            <li><a href="{{ url('/profil/sejarah') }}" class="text-decoration-none text-secondary">Sejarah</a></li>
+                            <li><a href="{{ url('/profil/visi-misi') }}" class="text-decoration-none text-secondary">Visi Misi</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/berita') }}" class="nav-link px-0 text-dark {{ Request::is('berita') ? 'text-teal-primary fw-bold' : '' }}">Berita</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/galeri') }}" class="nav-link px-0 text-dark {{ Request::is('galeri') ? 'text-teal-primary fw-bold' : '' }}">Galeri</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/kontak') }}" class="nav-link px-0 text-dark {{ Request::is('kontak') ? 'text-teal-primary fw-bold' : '' }}">Kontak</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-0 text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePPDBMobile" role="button" aria-expanded="false" aria-controls="collapsePPDBMobile">
+                        PPDB <i class="bi bi-chevron-down small"></i>
+                    </a>
+                    <div class="collapse" id="collapsePPDBMobile">
+                        <ul class="list-unstyled ms-3 mt-2 mb-0 d-flex flex-column gap-2">
+                            <li><a href="{{ url('/ppdb/gelombang') }}" class="text-decoration-none text-secondary">Informasi Gelombang</a></li>
+                            <li><a href="{{ url('/ppdb/jalur') }}" class="text-decoration-none text-secondary">Jalur Pendaftaran</a></li>
+                            <li><a href="{{ url('/ppdb/syarat') }}" class="text-decoration-none text-secondary">Syarat &amp; Perlengkapan</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Mobile CTA -->
+            <div class="mt-auto d-flex flex-column gap-3">
+                <a href="{{ route('login') }}" class="btn btn-outline-teal rounded-pill fw-semibold py-2">Masuk Akun</a>
+                <a href="{{ route('register') }}" class="btn btn-teal rounded-pill fw-semibold py-2">Registrasi</a>
+            </div>
+        </div>
+    </div>
 
     <main class="flex-grow-1">
 
