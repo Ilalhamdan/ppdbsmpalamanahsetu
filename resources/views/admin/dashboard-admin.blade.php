@@ -563,7 +563,7 @@
 
             {{-- ===================== SIDEBAR ===================== --}}
             <div class="sidebar px-3 py-4 position-fixed start-0 top-0 bottom-0 text-white"
-                style="width:270px;height:100vh;overflow-y:auto;">
+                style="width:270px;height:100%;overflow-y:auto;">
                 <div class="d-flex align-items-center gap-3 mb-4 px-2">
                     <div class="rounded p-1 d-flex align-items-center justify-content-center bg-white"
                         style="width:42px;height:42px;min-width:42px;">

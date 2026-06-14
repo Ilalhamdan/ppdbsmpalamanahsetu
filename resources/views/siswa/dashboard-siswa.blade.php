@@ -63,7 +63,7 @@
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: var(--sidebar-width);
-            min-height: 100vh;
+            height: 100%;
             background: linear-gradient(180deg, #0d9488 0%, #0f766e 50%, #115e59 100%);
             position: fixed;
             top: 0;
