@@ -174,6 +174,21 @@
                 display: none;
             }
         }
+
+        /* Mobile Menu Enhancements */
+        .hover-text-teal:hover {
+            color: var(--teal-primary) !important;
+            padding-left: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .transition-transform {
+            transition: transform 0.3s ease;
+        }
+        
+        [aria-expanded="true"] .transition-transform {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 
@@ -269,56 +284,70 @@
         </div>
     </header>
 
-    <!-- Offcanvas Mobile Menu -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title fw-bold text-teal-primary" id="mobileMenuLabel">Menu Utama</h5>
-            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <!-- Offcanvas Mobile Menu (Modern App-like) -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel" style="width: 280px; border-radius: 24px 0 0 24px; border-left: none; box-shadow: -10px 0 40px rgba(0,0,0,0.1);">
+        <div class="offcanvas-header border-bottom border-opacity-10 py-4 px-4">
+            <h6 class="offcanvas-title fw-extrabold text-teal-primary text-uppercase tracking-wider mb-0" id="mobileMenuLabel" style="font-size: 13px; letter-spacing: 1px;">Menu Navigasi</h6>
+            <button type="button" class="btn-close shadow-none bg-light rounded-circle p-2 m-0" data-bs-dismiss="offcanvas" aria-label="Close" style="width: 32px; height: 32px;"></button>
         </div>
-        <div class="offcanvas-body d-flex flex-column">
+        <div class="offcanvas-body d-flex flex-column px-3 py-4">
             <!-- Mobile Nav Links -->
-            <ul class="nav flex-column gap-3 fw-semibold mb-4" style="font-size: 15px;">
-                <li class="nav-item">
-                    <a href="{{ url('/') }}" class="nav-link px-0 text-dark {{ Request::is('/') ? 'text-teal-primary fw-bold' : '' }}">Home</a>
+            <ul class="nav flex-column fw-semibold mb-4 w-100" style="font-size: 14.5px;">
+                <li class="nav-item mb-1">
+                    <a href="{{ url('/') }}" class="nav-link px-3 py-2.5 rounded-3 d-flex align-items-center gap-3 text-dark {{ Request::is('/') ? 'bg-teal-extra-light text-teal-primary fw-bold' : '' }}">
+                        <i class="bi bi-house-door {{ Request::is('/') ? 'text-teal-primary' : 'text-secondary' }} fs-5"></i> Home
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link px-0 text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseProfilMobile" role="button" aria-expanded="false" aria-controls="collapseProfilMobile">
-                        Profil <i class="bi bi-chevron-down small"></i>
+                <li class="nav-item mb-1">
+                    <a class="nav-link px-3 py-2.5 rounded-3 text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseProfilMobile" role="button" aria-expanded="false" aria-controls="collapseProfilMobile">
+                        <span class="d-flex align-items-center gap-3"><i class="bi bi-building text-secondary fs-5"></i> Profil</span>
+                        <i class="bi bi-chevron-down small text-secondary transition-transform"></i>
                     </a>
                     <div class="collapse" id="collapseProfilMobile">
-                        <ul class="list-unstyled ms-3 mt-2 mb-0 d-flex flex-column gap-2">
-                            <li><a href="{{ url('/profil/sejarah') }}" class="text-decoration-none text-secondary">Sejarah</a></li>
-                            <li><a href="{{ url('/profil/visi-misi') }}" class="text-decoration-none text-secondary">Visi Misi</a></li>
+                        <ul class="list-unstyled ms-5 mt-1 mb-2 d-flex flex-column gap-1">
+                            <li><a href="{{ url('/profil/sejarah') }}" class="text-decoration-none text-secondary small d-block py-1.5 hover-text-teal">Sejarah Sekolah</a></li>
+                            <li><a href="{{ url('/profil/visi-misi') }}" class="text-decoration-none text-secondary small d-block py-1.5 hover-text-teal">Visi &amp; Misi</a></li>
                         </ul>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ url('/berita') }}" class="nav-link px-0 text-dark {{ Request::is('berita') ? 'text-teal-primary fw-bold' : '' }}">Berita</a>
+                <li class="nav-item mb-1">
+                    <a href="{{ url('/berita') }}" class="nav-link px-3 py-2.5 rounded-3 d-flex align-items-center gap-3 text-dark {{ Request::is('berita') ? 'bg-teal-extra-light text-teal-primary fw-bold' : '' }}">
+                        <i class="bi bi-newspaper {{ Request::is('berita') ? 'text-teal-primary' : 'text-secondary' }} fs-5"></i> Berita
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ url('/galeri') }}" class="nav-link px-0 text-dark {{ Request::is('galeri') ? 'text-teal-primary fw-bold' : '' }}">Galeri</a>
+                <li class="nav-item mb-1">
+                    <a href="{{ url('/galeri') }}" class="nav-link px-3 py-2.5 rounded-3 d-flex align-items-center gap-3 text-dark {{ Request::is('galeri') ? 'bg-teal-extra-light text-teal-primary fw-bold' : '' }}">
+                        <i class="bi bi-images {{ Request::is('galeri') ? 'text-teal-primary' : 'text-secondary' }} fs-5"></i> Galeri
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ url('/kontak') }}" class="nav-link px-0 text-dark {{ Request::is('kontak') ? 'text-teal-primary fw-bold' : '' }}">Kontak</a>
+                <li class="nav-item mb-1">
+                    <a href="{{ url('/kontak') }}" class="nav-link px-3 py-2.5 rounded-3 d-flex align-items-center gap-3 text-dark {{ Request::is('kontak') ? 'bg-teal-extra-light text-teal-primary fw-bold' : '' }}">
+                        <i class="bi bi-telephone {{ Request::is('kontak') ? 'text-teal-primary' : 'text-secondary' }} fs-5"></i> Kontak
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link px-0 text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePPDBMobile" role="button" aria-expanded="false" aria-controls="collapsePPDBMobile">
-                        PPDB <i class="bi bi-chevron-down small"></i>
+                <li class="nav-item mb-1">
+                    <a class="nav-link px-3 py-2.5 rounded-3 text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePPDBMobile" role="button" aria-expanded="false" aria-controls="collapsePPDBMobile">
+                        <span class="d-flex align-items-center gap-3"><i class="bi bi-mortarboard text-secondary fs-5"></i> PPDB</span>
+                        <i class="bi bi-chevron-down small text-secondary transition-transform"></i>
                     </a>
                     <div class="collapse" id="collapsePPDBMobile">
-                        <ul class="list-unstyled ms-3 mt-2 mb-0 d-flex flex-column gap-2">
-                            <li><a href="{{ url('/ppdb/gelombang') }}" class="text-decoration-none text-secondary">Informasi Gelombang</a></li>
-                            <li><a href="{{ url('/ppdb/jalur') }}" class="text-decoration-none text-secondary">Jalur Pendaftaran</a></li>
-                            <li><a href="{{ url('/ppdb/syarat') }}" class="text-decoration-none text-secondary">Syarat &amp; Perlengkapan</a></li>
+                        <ul class="list-unstyled ms-5 mt-1 mb-2 d-flex flex-column gap-1">
+                            <li><a href="{{ url('/ppdb/gelombang') }}" class="text-decoration-none text-secondary small d-block py-1.5 hover-text-teal">Info Gelombang</a></li>
+                            <li><a href="{{ url('/ppdb/jalur') }}" class="text-decoration-none text-secondary small d-block py-1.5 hover-text-teal">Jalur Pendaftaran</a></li>
+                            <li><a href="{{ url('/ppdb/syarat') }}" class="text-decoration-none text-secondary small d-block py-1.5 hover-text-teal">Syarat Dokumen</a></li>
                         </ul>
                     </div>
                 </li>
             </ul>
 
             <!-- Mobile CTA -->
-            <div class="mt-auto d-flex flex-column gap-3">
-                <a href="{{ route('login') }}" class="btn btn-outline-teal rounded-pill fw-semibold py-2">Masuk Akun</a>
-                <a href="{{ route('register') }}" class="btn btn-teal rounded-pill fw-semibold py-2">Registrasi</a>
+            <div class="mt-auto pt-3 border-top border-opacity-10 d-flex flex-column gap-2.5">
+                <a href="{{ route('login') }}" class="btn btn-outline-teal rounded-pill fw-semibold py-2 d-flex justify-content-center align-items-center gap-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Masuk Akun
+                </a>
+                <a href="{{ route('register') }}" class="btn btn-teal rounded-pill fw-semibold py-2 d-flex justify-content-center align-items-center gap-2 shadow-sm">
+                    <i class="bi bi-person-plus"></i> Registrasi
+                </a>
             </div>
         </div>
     </div>
