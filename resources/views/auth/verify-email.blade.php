@@ -17,7 +17,7 @@
     <div class="card-verify text-center">
         <h2 class="fw-bold h4 mb-3"><i class="bi bi-envelope-check me-2"></i>Verifikasi Email Anda</h2>
         <p class="small text-white-50 mb-4" style="line-height: 1.6;">
-            Terima kasih telah mendaftar! Sebelum bisa masuk ke dashboard, mohon periksa kotak masuk email simulasi Anda di **Mailtrap** dan klik tautan aktivasi yang kami kirimkan.
+            Terima kasih telah mendaftar! Sebelum bisa masuk ke dashboard, mohon periksa <strong>kotak masuk email Anda</strong> (termasuk folder <strong>Spam/Junk</strong>) dan klik tautan aktivasi yang kami kirimkan.
         </p>
 
         @if (session('status') == 'verification-link-sent')

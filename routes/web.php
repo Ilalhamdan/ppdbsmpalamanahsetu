@@ -108,6 +108,11 @@ Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(funct
     Route::post('/payment/reject/{userId}', [\App\Http\Controllers\PaymentController::class, 'rejectPayment'])->name('admin.payment.reject');
     // Hapus Pendaftar (admin only)
     Route::delete('/pendaftar/delete/{userId}', [\App\Http\Controllers\PendaftaranController::class, 'deletePendaftar'])->name('admin.pendaftar.delete');
+
+    // Aktivasi Akun Siswa (admin only)
+    Route::get('/akun/pending', [\App\Http\Controllers\AkunAktivasiController::class, 'pending'])->name('admin.akun.pending');
+    Route::post('/akun/activate/{userId}', [\App\Http\Controllers\AkunAktivasiController::class, 'activate'])->name('admin.akun.activate');
+    Route::delete('/akun/reject/{userId}', [\App\Http\Controllers\AkunAktivasiController::class, 'reject'])->name('admin.akun.reject');
 });
 
 // 6. Logika Manajemen Akun (Bawaan Breeze)

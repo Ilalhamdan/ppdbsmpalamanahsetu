@@ -28,10 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                \Illuminate\Support\Facades\View::composer('*', function ($view) {
-                    $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
-                    $view->with('sys_settings', $settings);
-                });
+                $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+                \Illuminate\Support\Facades\View::share('sys_settings', $settings);
             }
         } catch (\Exception $e) {
             // Abaikan jika tabel settings belum ada saat migrasi

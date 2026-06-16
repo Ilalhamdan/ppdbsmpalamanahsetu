@@ -44,10 +44,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Mengirimkan event Registered untuk memicu verifikasi email otomatis
         event(new Registered($user));
 
-        // Hapus Auth::login($user) agar tidak otomatis login
-        // Arahkan kembali ke halaman login dengan pesan sukses
-        return redirect()->route('login')->with('status', 'Pendaftaran berhasil! Silakan cek kotak masuk email Anda (atau folder Spam) untuk mengklik link aktivasi sebelum Anda bisa login.');
+        // Mengautentikasi user secara otomatis
+        Auth::login($user);
+
+        // Mengarahkan ke dashboard (di mana middleware 'verified' akan memicu halaman verifikasi email jika belum diverifikasi)
+        return redirect()->route('dashboard');
     }
 }
