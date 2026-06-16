@@ -55,4 +55,16 @@ class User extends Authenticatable implements MustVerifyEmail // 2. Daftarkan im
     {
         return $this->hasOne(CalonSiswa::class, 'user_id');
     }
+
+    /**
+     * Kirim email verifikasi dengan pengaman try-catch
+     */
+    public function sendEmailVerificationNotification()
+    {
+        try {
+            $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail);
+        } catch (\Exception $e) {
+            \Log::warning('Gagal mengirim email verifikasi ke ' . $this->email . ': ' . $e->getMessage());
+        }
+    }
 }
