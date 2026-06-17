@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail; // 1. Aktifkan kontrak verifikasi email
+// Email verification dihapus - akun langsung aktif saat registrasi
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail // 2. Daftarkan implementasi di sini
+class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail // 2. Daftarkan im
         'email',
         'password',
         'role',  // 4. Tambahan kolom role aktor (admin/siswa) sesuai ERD
+        'email_verified_at', // Langsung aktif saat registrasi
     ];
 
     /**
@@ -56,15 +57,4 @@ class User extends Authenticatable implements MustVerifyEmail // 2. Daftarkan im
         return $this->hasOne(CalonSiswa::class, 'user_id');
     }
 
-    /**
-     * Kirim email verifikasi dengan pengaman try-catch
-     */
-    public function sendEmailVerificationNotification()
-    {
-        try {
-            $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail);
-        } catch (\Exception $e) {
-            \Log::warning('Gagal mengirim email verifikasi ke ' . $this->email . ': ' . $e->getMessage());
-        }
-    }
 }

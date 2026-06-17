@@ -636,13 +636,7 @@
                             <i class="bi bi-images me-3 fs-5"></i> Kelola Galeri
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="linkAktivasiAkun" href="#"
-                            onclick="switchSection('AktivasiAkun');return false;">
-                            <i class="bi bi-person-check-fill me-3 fs-5"></i> Aktivasi Akun
-                            <span id="badgePendingAkun" class="badge bg-danger rounded-pill ms-auto" style="font-size:10px;display:none;">0</span>
-                        </a>
-                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" id="linkPengaturanSistem" href="#"
                             onclick="switchSection('PengaturanSistem');return false;">
@@ -1708,41 +1702,7 @@
                         </div>
                     </div>{{-- /sectionPengaturanSistem --}}
 
-                    {{-- ===== AKTIVASI AKUN ===== --}}
-                    <div id="sectionAktivasiAkun" class="spa-section">
-                        <div class="panel-kustom">
-                            <div class="panel-title">
-                                <i class="bi bi-person-check-fill me-1"></i> Aktivasi Akun Calon Siswa
-                                <button class="btn btn-sm btn-toska ms-auto" onclick="loadPendingAkun()" style="font-size:11px;border-radius:8px;">
-                                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-                                </button>
-                            </div>
-                            <p class="text-muted mb-3" style="font-size:12.5px;">
-                                Daftar akun calon siswa yang baru mendaftar dan belum diaktivasi. Klik <strong>Aktivasi</strong> untuk mengizinkan siswa login ke dashboard PPDB.
-                            </p>
-                            <div class="table-responsive">
-                                <table class="table table-kustom mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Tanggal Daftar</th>
-                                            <th class="text-center">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbodyPendingAkun">
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted py-4" style="font-size:12.5px;">
-                                                <i class="bi bi-arrow-clockwise" style="font-size:20px;display:block;margin-bottom:4px;"></i>
-                                                Memuat data...
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>{{-- /sectionAktivasiAkun --}}
+
 
                 </div>{{-- /p-4 --}}
             </div>{{-- /flex-grow-1 --}}
@@ -2021,8 +1981,7 @@
                 'KelolaBerita': 'sectionKelolaBerita',
                 'KelolaKontenHome': 'sectionKelolaKontenHome',
                 'KelolaGaleri': 'sectionKelolaGaleri',
-                'PengaturanSistem': 'sectionPengaturanSistem',
-                'AktivasiAkun': 'sectionAktivasiAkun'
+                'PengaturanSistem': 'sectionPengaturanSistem'
             };
             const linkMap = {
                 'AdminDashboard': 'linkAdminDashboard',
@@ -2034,8 +1993,7 @@
                 'KelolaBerita': 'linkKelolaBerita',
                 'KelolaKontenHome': 'linkKelolaKontenHome',
                 'KelolaGaleri': 'linkKelolaGaleri',
-                'PengaturanSistem': 'linkPengaturanSistem',
-                'AktivasiAkun': 'linkAktivasiAkun'
+                'PengaturanSistem': 'linkPengaturanSistem'
             };
             const titles = {
                 'AdminDashboard': 'Dashboard Utama',
@@ -2047,8 +2005,7 @@
                 'KelolaBerita': 'Kelola Berita',
                 'KelolaKontenHome': 'Kelola Konten Home',
                 'KelolaGaleri': 'Kelola Galeri',
-                'PengaturanSistem': 'Pengaturan Sistem',
-                'AktivasiAkun': 'Aktivasi Akun'
+                'PengaturanSistem': 'Pengaturan Sistem'
             };
 
             const sEl = document.getElementById(sectionMap[name]);
@@ -2074,7 +2031,7 @@
             if (name === 'KelolaKontenHome') renderDaftarSlider();
             if (name === 'KelolaGaleri') renderDaftarGaleri();
             if (name === 'AdminDashboard') { updateDashboardStats(); renderChart(); renderRecentActivity(); }
-            if (name === 'AktivasiAkun') loadPendingAkun();
+
 
             adminNotifOpen = false;
             const panel = document.getElementById('adminNotifPanel');
@@ -4358,109 +4315,6 @@
             }
         }
     </script>
-    <script>
-        // ==================== AKTIVASI AKUN (SERVER-SIDE) ====================
-        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
-
-        async function loadPendingAkun() {
-            const tbody = document.getElementById('tbodyPendingAkun');
-            if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4" style="font-size:12.5px;"><div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div> Memuat data...</td></tr>';
-
-            try {
-                const res = await fetch('{{ route("admin.akun.pending") }}', {
-                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
-                });
-                const users = await res.json();
-
-                // Update badge count di sidebar
-                const badge = document.getElementById('badgePendingAkun');
-                if (badge) {
-                    if (users.length > 0) {
-                        badge.textContent = users.length;
-                        badge.style.display = 'inline-block';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                }
-
-                if (users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4" style="font-size:12.5px;"><i class="bi bi-check-circle-fill text-success" style="font-size:24px;display:block;margin-bottom:6px;"></i> Semua akun sudah diaktivasi!</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = users.map((u, i) => `
-                    <tr id="rowAkun${u.id}">
-                        <td class="fw-semibold">${i + 1}</td>
-                        <td><span class="fw-semibold">${u.name}</span></td>
-                        <td><span class="text-muted">${u.email}</span></td>
-                        <td><span class="text-muted">${new Date(u.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></td>
-                        <td class="text-center">
-                            <button class="btn btn-sm px-3 me-1" style="background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:600;" onclick="activateAkun(${u.id})" title="Aktivasi akun ini">
-                                <i class="bi bi-check-circle-fill me-1"></i> Aktivasi
-                            </button>
-                            <button class="btn btn-sm px-3" style="background:#fee2e2;color:#dc2626;border:1px solid #fecdd3;border-radius:20px;font-size:11px;font-weight:600;" onclick="rejectAkun(${u.id}, '${u.name}')" title="Tolak & hapus akun ini">
-                                <i class="bi bi-x-circle-fill me-1"></i> Tolak
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4" style="font-size:12.5px;"><i class="bi bi-exclamation-triangle-fill" style="font-size:20px;display:block;margin-bottom:4px;"></i> Gagal memuat data: ' + e.message + '</td></tr>';
-            }
-        }
-
-        async function activateAkun(userId) {
-            if (!confirm('Yakin ingin mengaktivasi akun ini? Siswa akan bisa login ke dashboard PPDB.')) return;
-            try {
-                const res = await fetch(`/admin/akun/activate/${userId}`, {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    showToast('<i class="bi bi-check-circle-fill text-success"></i>', 'Akun Diaktivasi', data.message);
-                    loadPendingAkun();
-                } else {
-                    showToast('<i class="bi bi-exclamation-triangle-fill text-warning"></i>', 'Gagal', data.message || 'Terjadi kesalahan.');
-                }
-            } catch (e) {
-                alert('Gagal mengaktivasi: ' + e.message);
-            }
-        }
-
-        async function rejectAkun(userId, nama) {
-            if (!confirm(`Yakin ingin MENOLAK dan MENGHAPUS akun "${nama}"? Tindakan ini tidak bisa dibatalkan!`)) return;
-            try {
-                const res = await fetch(`/admin/akun/reject/${userId}`, {
-                    method: 'DELETE',
-                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    showToast('<i class="bi bi-trash-fill text-danger"></i>', 'Akun Ditolak', data.message);
-                    loadPendingAkun();
-                } else {
-                    showToast('<i class="bi bi-exclamation-triangle-fill text-warning"></i>', 'Gagal', data.message || 'Terjadi kesalahan.');
-                }
-            } catch (e) {
-                alert('Gagal menolak: ' + e.message);
-            }
-        }
-
-        // Load pending accounts on page load to update sidebar badge
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('{{ route("admin.akun.pending") }}', { headers: { 'Accept': 'application/json' } })
-                .then(r => r.json())
-                .then(users => {
-                    const badge = document.getElementById('badgePendingAkun');
-                    if (badge && users.length > 0) {
-                        badge.textContent = users.length;
-                        badge.style.display = 'inline-block';
-                    }
-                })
-                .catch(() => {});
-        });
     </script>
     <script>
         // Responsive Sidebar functions

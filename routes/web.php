@@ -80,17 +80,17 @@ Route::get('/dashboard', function () {
     }
     
     return view('siswa.dashboard-siswa', compact('siswa', 'dbStatusPembayaran', 'dbCatatanPembayaran', 'dbBuktiTransferManual', 'dbNamaPengirim'));
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 // 5b. Dashboard Admin - Hanya untuk user dengan role 'admin'
 Route::get('/admin/dashboard', function () {
     $siswa = Auth::user();
     $dbPendaftarCount = \App\Models\CalonSiswa::count();
     return view('admin.dashboard-admin', compact('siswa', 'dbPendaftarCount'));
-})->middleware(['auth', 'verified', 'isAdmin'])->name('admin.dashboard');
+})->middleware(['auth', 'isAdmin'])->name('admin.dashboard');
 
 // 5c. API Kelola Home Slider (admin only)
-Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'isAdmin'])->prefix('admin')->group(function () {
     Route::get('/home-slider', [HomeSliderController::class, 'index'])->name('admin.slider.index');
     Route::post('/home-slider', [HomeSliderController::class, 'store'])->name('admin.slider.store');
     Route::put('/home-slider/{id}', [HomeSliderController::class, 'update'])->name('admin.slider.update');
@@ -109,10 +109,6 @@ Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(funct
     // Hapus Pendaftar (admin only)
     Route::delete('/pendaftar/delete/{userId}', [\App\Http\Controllers\PendaftaranController::class, 'deletePendaftar'])->name('admin.pendaftar.delete');
 
-    // Aktivasi Akun Siswa (admin only)
-    Route::get('/akun/pending', [\App\Http\Controllers\AkunAktivasiController::class, 'pending'])->name('admin.akun.pending');
-    Route::post('/akun/activate/{userId}', [\App\Http\Controllers\AkunAktivasiController::class, 'activate'])->name('admin.akun.activate');
-    Route::delete('/akun/reject/{userId}', [\App\Http\Controllers\AkunAktivasiController::class, 'reject'])->name('admin.akun.reject');
 });
 
 // 6. Logika Manajemen Akun (Bawaan Breeze)

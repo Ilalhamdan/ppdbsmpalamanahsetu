@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+// Email verification dihapus - akun langsung aktif
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,15 +42,13 @@ class RegisteredUserController extends Controller
             'email'    => $request->email,
             'role'     => 'siswa',
             'password' => Hash::make($request->password),
+            'email_verified_at' => now(), // Langsung aktif tanpa verifikasi email
         ]);
-
-        // Mengirimkan event Registered untuk memicu verifikasi email otomatis
-        event(new Registered($user));
 
         // Mengautentikasi user secara otomatis
         Auth::login($user);
 
-        // Mengarahkan ke dashboard (di mana middleware 'verified' akan memicu halaman verifikasi email jika belum diverifikasi)
+        // Langsung masuk ke dashboard tanpa perlu verifikasi email
         return redirect()->route('dashboard');
     }
 }
