@@ -4595,109 +4595,104 @@
             const photoSrc = (photoImg && photoImg.style.display !== 'none' && photoImg.src) ? photoImg.src : '';
             const logoSrc = document.getElementById('kopLogoImg')?.src || '';
 
-            // HTML format surat resmi A4 (seperti surat keterangan sekolah)
+            // Modern, Professional Admission Ticket HTML
             const suratHTML = `
-    <div style="width:210mm;min-height:297mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:10mm 18mm 15mm 18mm;">
+            <div style="width: 800px; padding: 40px; background-color: #ffffff; font-family: 'Inter', sans-serif; color: #1e293b; box-sizing: border-box;">
+                <!-- Container Card -->
+                <div style="border: 2px solid #0f766e; border-radius: 20px; overflow: hidden; background: #ffffff; position: relative; box-shadow: 0 10px 40px rgba(15, 118, 110, 0.1);">
+                    
+                    <!-- Decorative Background Element -->
+                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(13, 148, 136, 0.05); border-radius: 50%; z-index: 0;"></div>
+                    <div style="position: absolute; bottom: -80px; left: -80px; width: 250px; height: 250px; background: rgba(13, 148, 136, 0.05); border-radius: 50%; z-index: 0;"></div>
 
-        <!-- KOP SURAT: Logo kiri + Teks kanan -->
-        <div style="display:flex;align-items:center;gap:14px;padding-bottom:8px;">
-            <img src="${logoSrc}" style="width:80px;height:80px;object-fit:contain;flex-shrink:0;" crossorigin="anonymous">
-            <div style="flex:1;text-align:center;line-height:1.35;">
-                <div style="font-size:10pt;font-weight:400;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.5px;">YAYASAN PENDIDIKAN DAN PONDOK PESANTREN AL AMANAH AL BANTANI</div>
-                <div style="font-size:8pt;color:#444;margin-top:1px;">Akta Notaris SK. MENKUMHAM No. AHU-06738.50.10.2014</div>
-                <div style="font-size:24pt;font-weight:700;color:#15803d;letter-spacing:2px;margin:2px 0 1px;line-height:1.1;font-family:'Arial Black',Arial,sans-serif;">SMP AL AMANAH</div>
-                <div style="font-size:8.5pt;color:#1a1a1a;font-weight:600;margin-top:1px;">NSS: 202280324002 &nbsp;|&nbsp; NPSN: 20603598 &nbsp;|&nbsp; NDS: 2002040072</div>
-                <div style="font-size:8pt;color:#444;margin-top:2px;">Jl. Raya Puspiptek Pocis, Setu, Kota Tangerang Selatan, Banten 15314</div>
-                <div style="font-size:8pt;color:#444;">Telp. (021) 7560 783 &nbsp;|&nbsp; Email: smp.alamanah@yahoo.com</div>
-            </div>
-        </div>
+                    <!-- Header Section -->
+                    <div style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: white; padding: 30px 35px; display: flex; align-items: center; gap: 24px; position: relative; z-index: 1;">
+                        <div style="width: 85px; height: 85px; background: white; border-radius: 16px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                            <img src="${logoSrc}" style="width: 100%; height: 100%; object-fit: contain;" crossorigin="anonymous">
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #ccfbf1; text-transform: uppercase; margin-bottom: 4px;">Yayasan Pendidikan & Pondok Pesantren Al Amanah Al Bantani</div>
+                            <div style="font-size: 28px; font-weight: 900; letter-spacing: 1.5px; margin: 0 0 6px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">SMP AL AMANAH</div>
+                            <div style="font-size: 11px; color: #99f6e4; font-weight: 600; display: flex; gap: 10px; align-items: center;">
+                                <span>NSS: 202280324002</span> &bull; <span>NPSN: 20603598</span> &bull; <span>NDS: 2002040072</span>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- GARIS KOP (tebal + tipis) -->
-        <div style="border-top:3px solid #000000;margin-top:2px;"></div>
-        <div style="border-top:1.5px solid #000000;margin-top:2px;margin-bottom:14px;"></div>
+                    <!-- Title Section -->
+                    <div style="background: #f8fafc; padding: 18px 35px; text-align: center; border-bottom: 2px solid #e2e8f0; position: relative; z-index: 1;">
+                        <div style="font-size: 22px; font-weight: 900; color: #0f766e; text-transform: uppercase; letter-spacing: 3px;">KARTU PESERTA UJIAN MASUK</div>
+                        <div style="font-size: 14px; font-weight: 700; color: #64748b; margin-top: 4px;">Tahun Pelajaran 2026/2027</div>
+                    </div>
 
-        <!-- JUDUL KARTU (bergaris bawah, seperti surat resmi) -->
-        <div style="text-align:center;margin-bottom:4px;">
-            <div style="font-size:13pt;font-weight:700;color:#000000;letter-spacing:2px;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;font-family:'Arial',sans-serif;">KARTU PESERTA UJIAN MASUK</div>
-        </div>
-        <div style="text-align:center;margin-bottom:14px;">
-            <div style="font-size:10pt;color:#000000;font-weight:400;border-bottom:1px solid #000;display:inline-block;padding-bottom:2px;">Tahun Pelajaran 2026/2027</div>
-        </div>
+                    <!-- Content Section -->
+                    <div style="padding: 35px; display: flex; gap: 45px; position: relative; z-index: 1;">
+                        <!-- Left Info -->
+                        <div style="flex: 1;">
+                            <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 14px 0; color: #64748b; font-weight: 600; width: 40%; border-bottom: 1px dashed #cbd5e1;">Nomor Pendaftaran</td>
+                                        <td style="padding: 14px 0; font-weight: 900; color: #0f766e; font-size: 18px; border-bottom: 1px dashed #cbd5e1; letter-spacing: 1px;">${noDaftar}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 14px 0; color: #64748b; font-weight: 600; border-bottom: 1px dashed #cbd5e1;">Nama Lengkap</td>
+                                        <td style="padding: 14px 0; font-weight: 800; color: #1e293b; border-bottom: 1px dashed #cbd5e1; font-size: 17px;">${nama.toUpperCase()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 14px 0; color: #64748b; font-weight: 600; border-bottom: 1px dashed #cbd5e1;">NISN</td>
+                                        <td style="padding: 14px 0; font-weight: 700; color: #334155; border-bottom: 1px dashed #cbd5e1;">${nisn}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 14px 0; color: #64748b; font-weight: 600; border-bottom: 1px dashed #cbd5e1;">Jalur Pendaftaran</td>
+                                        <td style="padding: 14px 0; font-weight: 700; color: #334155; border-bottom: 1px dashed #cbd5e1;">${jalur}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 14px 0; color: #64748b; font-weight: 600; border-bottom: 1px dashed #cbd5e1;">Asal Sekolah</td>
+                                        <td style="padding: 14px 0; font-weight: 700; color: #334155; border-bottom: 1px dashed #cbd5e1;">${asal}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 14px 0; color: #64748b; font-weight: 600; border-bottom: 1px dashed #cbd5e1;">Jadwal Ujian</td>
+                                        <td style="padding: 14px 0; font-weight: 800; color: #b45309; border-bottom: 1px dashed #cbd5e1;">${tanggal}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-        <!-- IDENTITAS PESERTA + FOTO -->
-        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:16px;">
+                        <!-- Right Photo -->
+                        <div style="width: 150px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                            <div style="width: 135px; height: 180px; border: 4px solid #0f766e; border-radius: 16px; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(15, 118, 110, 0.2);">
+                                ${photoSrc 
+                                    ? `<img src="${photoSrc}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">` 
+                                    : `<div style="text-align: center; color: #94a3b8; font-size: 12px; font-weight: 700; line-height: 1.5;">PAS FOTO<br>3 x 4<br><span style="font-size: 10px; font-weight: 500;">(Warna)</span></div>`
+                                }
+                            </div>
+                            <div style="font-size: 11px; font-weight: 800; color: #ffffff; background: #0f766e; padding: 6px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(15, 118, 110, 0.3);">Peserta Ujian</div>
+                        </div>
+                    </div>
 
-            <!-- Tabel Data Peserta -->
-            <div style="flex:1;">
-                <table style="width:100%;border-collapse:collapse;font-size:11pt;line-height:1.85;">
-                    <tr>
-                        <td style="width:34%;padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Nama Lengkap</td>
-                        <td style="width:4px;vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:700;color:#000;">${nama.toUpperCase()}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">No. Peserta</td>
-                        <td style="vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:700;color:#15803d;text-decoration:underline;">${noDaftar}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">NISN</td>
-                        <td style="vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:400;color:#000;">${nisn}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Jalur</td>
-                        <td style="vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:400;color:#000;">${jalur}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Asal Sekolah</td>
-                        <td style="vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:400;color:#000;">${asal}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Tanggal Ujian</td>
-                        <td style="vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:700;color:#15803d;">${tanggal}</td>
-                    </tr>
-                </table>
-            </div>
-
-            <!-- Foto Siswa 3x4 -->
-            <div style="flex-shrink:0;text-align:center;">
-                <div style="width:100px;height:130px;border:2px solid #000000;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
-                    ${photoSrc
-                    ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;" crossorigin="anonymous">`
-                    : `<div style="text-align:center;color:#9ca3af;font-size:9pt;font-weight:600;line-height:1.6;font-family:Arial,sans-serif;">Foto Peserta</div>`
-                }
+                    <!-- Footer / Rules -->
+                    <div style="background: #fffbeb; padding: 25px 35px; border-top: 2px solid #fde68a; position: relative; z-index: 1;">
+                        <div style="font-size: 14px; font-weight: 900; color: #92400e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            PERHATIAN & TATA TERTIB
+                        </div>
+                        <ol style="margin: 0; padding-left: 24px; font-size: 13px; color: #92400e; font-weight: 600; line-height: 1.8;">
+                            <li>Kartu ini <strong>WAJIB DICETAK dan DIBAWA</strong> saat mengikuti pelaksanaan ujian masuk.</li>
+                            <li>Peserta wajib hadir paling lambat <strong>30 menit</strong> sebelum ujian dimulai.</li>
+                            <li>Peserta wajib menggunakan seragam sekolah asal atau pakaian rapi dan sopan.</li>
+                            <li>Peserta diharapkan membawa perlengkapan alat tulis pribadi secukupnya.</li>
+                        </ol>
+                    </div>
                 </div>
-                <div style="font-size:8pt;color:#374151;margin-top:3px;font-style:italic;font-family:Arial,sans-serif;">Foto Peserta</div>
+                
+                <!-- Bottom Watermark/Authenticity -->
+                <div style="margin-top: 25px; text-align: center; font-size: 12px; color: #94a3b8; font-weight: 600;">
+                    Dokumen ini digenerate secara otomatis oleh Sistem PPDB SMP Al Amanah. <br>
+                    Validitas dapat diverifikasi melalui Panitia Penerimaan Peserta Didik Baru.
+                </div>
             </div>
-        </div>
-
-        <!-- GARIS PEMISAH -->
-        <div style="border-top:1px solid #000000;margin-bottom:12px;"></div>
-
-        <!-- CATATAN PENTING -->
-        <div style="margin-bottom:16px;">
-            <div style="font-size:10pt;font-weight:700;color:#000000;margin-bottom:5px;text-decoration:underline;">Catatan Penting:</div>
-            <div style="font-size:10pt;color:#000000;line-height:1.75;">
-                <div>1. Kartu ini wajib dibawa saat ujian masuk.</div>
-                <div>2. Hadir paling lambat 30 menit sebelum ujian dimulai.</div>
-                <div>3. Berpakaian rapi sesuai seragam SD/MI asal.</div>
-                <div>4. Dilarang membawa perangkat elektronik ke dalam ruang ujian.</div>
-            </div>
-        </div>
-
-        <!-- KETERANGAN KEASLIAN -->
-        <div style="border-top:1px dashed #888;padding-top:12px;text-align:center;">
-            <div style="display:inline-block;border:1px solid #15803d;border-radius:4px;padding:6px 22px;font-size:9pt;font-style:italic;color:#15803d;font-family:Arial,sans-serif;">
-                Kartu ini sah sebagai tanda peserta ujian masuk PPDB SMP Al Amanah Tahun Pelajaran 2026/2027
-            </div>
-        </div>
-
-    </div>
-    `;
+            `;
 
             const wrapper = document.createElement('div');
             wrapper.innerHTML = suratHTML;
@@ -4706,7 +4701,7 @@
 
             const opt = {
                 margin: 0,
-                filename: 'Kartu Ujian PPDB - ' + nama + '.pdf',
+                filename: 'Kartu_Ujian_PPDB_' + nama.replace(/\s+/g, '_') + '.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 3, useCORS: true, allowTaint: true, letterRendering: true, backgroundColor: '#ffffff' },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
