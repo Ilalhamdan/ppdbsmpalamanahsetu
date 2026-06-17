@@ -4597,64 +4597,66 @@
 
             // HTML format surat resmi A4 (seperti surat keterangan sekolah)
             const suratHTML = `
-    <div style="width:210mm;min-height:297mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:15mm 20mm 15mm 20mm;">
+    <div style="width:210mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:10mm 18mm 10mm 18mm;">
 
         <!-- KOP SURAT: Logo kiri + Teks kanan -->
-        <div style="display:flex;align-items:center;gap:16px;padding-bottom:10px;">
-            <img src="${logoSrc}" style="width:90px;height:90px;object-fit:contain;flex-shrink:0;" crossorigin="anonymous">
-            <div style="flex:1;text-align:center;line-height:1.4;">
+        <div style="display:flex;align-items:center;gap:14px;padding-bottom:8px;">
+            <img src="${logoSrc}" style="width:80px;height:80px;object-fit:contain;flex-shrink:0;" crossorigin="anonymous">
+            <div style="flex:1;text-align:center;line-height:1.35;">
                 <div style="font-size:10pt;font-weight:400;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.5px;">YAYASAN PENDIDIKAN DAN PONDOK PESANTREN AL AMANAH AL BANTANI</div>
-                <div style="font-size:8.5pt;color:#444;margin-top:1px;">Akta Notaris SK. MENKUMHAM No. AHU-06738.50.10.2014</div>
-                <div style="font-size:28pt;font-weight:700;color:#15803d;letter-spacing:2px;margin:3px 0 1px;line-height:1.1;font-family:'Arial Black',Arial,sans-serif;">SMP AL AMANAH</div>
-                <div style="font-size:9pt;color:#1a1a1a;font-weight:600;margin-top:1px;">NSS: 202280324002 &nbsp;|&nbsp; NPSN: 20603598 &nbsp;|&nbsp; NDS: 2002040072</div>
-                <div style="font-size:8.5pt;color:#444;margin-top:2px;">Jl. Raya Puspiptek Pocis, Setu, Kota Tangerang Selatan, Banten 15314</div>
-                <div style="font-size:8.5pt;color:#444;">Telp. (021) 7560 783 &nbsp;|&nbsp; Email: smp.alamanah@yahoo.com</div>
+                <div style="font-size:8pt;color:#444;margin-top:1px;">Akta Notaris SK. MENKUMHAM No. AHU-06738.50.10.2014</div>
+                <div style="font-size:24pt;font-weight:700;color:#15803d;letter-spacing:2px;margin:2px 0 1px;line-height:1.1;font-family:'Arial Black',Arial,sans-serif;">SMP AL AMANAH</div>
+                <div style="font-size:8.5pt;color:#1a1a1a;font-weight:600;margin-top:1px;">NSS: 202280324002 &nbsp;|&nbsp; NPSN: 20603598 &nbsp;|&nbsp; NDS: 2002040072</div>
+                <div style="font-size:8pt;color:#444;margin-top:2px;">Jl. Raya Puspiptek Pocis, Setu, Kota Tangerang Selatan, Banten 15314</div>
+                <div style="font-size:8pt;color:#444;">Telp. (021) 7560 783 &nbsp;|&nbsp; Email: smp.alamanah@yahoo.com</div>
             </div>
         </div>
 
         <!-- GARIS KOP (tebal + tipis) -->
-        <div style="border-top:4px solid #000000;margin-top:2px;"></div>
-        <div style="border-top:1.5px solid #000000;margin-top:2px;margin-bottom:12px;"></div>
+        <div style="border-top:3px solid #000000;margin-top:2px;"></div>
+        <div style="border-top:1.5px solid #000000;margin-top:2px;margin-bottom:14px;"></div>
 
         <!-- JUDUL KARTU (bergaris bawah, seperti surat resmi) -->
-        <div style="text-align:center;margin-bottom:16px;">
-            <div style="font-size:14pt;font-weight:700;color:#000000;letter-spacing:2px;text-transform:uppercase;text-decoration:underline;font-family:'Arial',sans-serif;">KARTU PESERTA UJIAN MASUK</div>
-            <div style="font-size:10pt;color:#000000;margin-top:3px;font-weight:400;">Tahun Pelajaran 2026/2027</div>
+        <div style="text-align:center;margin-bottom:4px;">
+            <div style="font-size:13pt;font-weight:700;color:#000000;letter-spacing:2px;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;font-family:'Arial',sans-serif;">KARTU PESERTA UJIAN MASUK</div>
+        </div>
+        <div style="text-align:center;margin-bottom:14px;">
+            <div style="font-size:10pt;color:#000000;font-weight:400;border-bottom:1px solid #000;display:inline-block;padding-bottom:2px;">Tahun Pelajaran 2026/2027</div>
         </div>
 
         <!-- IDENTITAS PESERTA + FOTO -->
-        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
+        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:16px;">
 
             <!-- Tabel Data Peserta -->
             <div style="flex:1;">
-                <table style="width:100%;border-collapse:collapse;font-size:11pt;line-height:1.9;">
+                <table style="width:100%;border-collapse:collapse;font-size:11pt;line-height:1.85;">
                     <tr>
-                        <td style="width:36%;padding:2px 0;vertical-align:top;font-weight:400;color:#000;">Nama Lengkap</td>
+                        <td style="width:34%;padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Nama Lengkap</td>
                         <td style="width:4px;vertical-align:top;padding:2px 4px;">:</td>
                         <td style="padding:2px 0;font-weight:700;color:#000;">${nama.toUpperCase()}</td>
                     </tr>
                     <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:400;color:#000;">No. Peserta</td>
+                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">No. Peserta</td>
                         <td style="vertical-align:top;padding:2px 4px;">:</td>
-                        <td style="padding:2px 0;font-weight:700;color:#15803d;">${noDaftar}</td>
+                        <td style="padding:2px 0;font-weight:700;color:#15803d;text-decoration:underline;">${noDaftar}</td>
                     </tr>
                     <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:400;color:#000;">NISN</td>
+                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">NISN</td>
                         <td style="vertical-align:top;padding:2px 4px;">:</td>
                         <td style="padding:2px 0;font-weight:400;color:#000;">${nisn}</td>
                     </tr>
                     <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:400;color:#000;">Jalur</td>
+                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Jalur</td>
                         <td style="vertical-align:top;padding:2px 4px;">:</td>
                         <td style="padding:2px 0;font-weight:400;color:#000;">${jalur}</td>
                     </tr>
                     <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:400;color:#000;">Asal Sekolah</td>
+                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Asal Sekolah</td>
                         <td style="vertical-align:top;padding:2px 4px;">:</td>
                         <td style="padding:2px 0;font-weight:400;color:#000;">${asal}</td>
                     </tr>
                     <tr>
-                        <td style="padding:2px 0;vertical-align:top;font-weight:400;color:#000;">Tanggal Ujian</td>
+                        <td style="padding:2px 0;vertical-align:top;font-weight:700;color:#000;">Tanggal Ujian</td>
                         <td style="vertical-align:top;padding:2px 4px;">:</td>
                         <td style="padding:2px 0;font-weight:700;color:#15803d;">${tanggal}</td>
                     </tr>
@@ -4663,13 +4665,13 @@
 
             <!-- Foto Siswa 3x4 -->
             <div style="flex-shrink:0;text-align:center;">
-                <div style="width:105px;height:140px;border:2px solid #000000;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+                <div style="width:100px;height:130px;border:2px solid #000000;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
                     ${photoSrc
                     ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;" crossorigin="anonymous">`
-                    : `<div style="text-align:center;color:#9ca3af;font-size:9pt;font-weight:600;line-height:1.6;font-family:Arial,sans-serif;">PAS<br>FOTO<br>3&times;4</div>`
+                    : `<div style="text-align:center;color:#9ca3af;font-size:9pt;font-weight:600;line-height:1.6;font-family:Arial,sans-serif;">Foto Peserta</div>`
                 }
                 </div>
-                <div style="font-size:8pt;color:#374151;margin-top:4px;font-family:Arial,sans-serif;">Foto Peserta</div>
+                <div style="font-size:8pt;color:#374151;margin-top:3px;font-style:italic;font-family:Arial,sans-serif;">Foto Peserta</div>
             </div>
         </div>
 
@@ -4678,8 +4680,8 @@
 
         <!-- CATATAN PENTING -->
         <div style="margin-bottom:16px;">
-            <div style="font-size:10pt;font-weight:700;color:#000000;margin-bottom:5px;">Catatan Penting:</div>
-            <div style="font-size:10pt;color:#000000;line-height:1.8;">
+            <div style="font-size:10pt;font-weight:700;color:#000000;margin-bottom:5px;text-decoration:underline;">Catatan Penting:</div>
+            <div style="font-size:10pt;color:#000000;line-height:1.75;">
                 <div>1. Kartu ini wajib dibawa saat ujian masuk.</div>
                 <div>2. Hadir paling lambat 30 menit sebelum ujian dimulai.</div>
                 <div>3. Berpakaian rapi sesuai seragam SD/MI asal.</div>
@@ -4688,8 +4690,8 @@
         </div>
 
         <!-- KETERANGAN KEASLIAN -->
-        <div style="border-top:1px dashed #888;padding-top:10px;text-align:center;">
-            <div style="display:inline-block;border:1px solid #15803d;padding:5px 20px;font-size:9pt;font-style:italic;color:#15803d;font-family:Arial,sans-serif;">
+        <div style="border-top:1px dashed #888;padding-top:12px;text-align:center;">
+            <div style="display:inline-block;border:1px solid #15803d;border-radius:4px;padding:6px 22px;font-size:9pt;font-style:italic;color:#15803d;font-family:Arial,sans-serif;">
                 Kartu ini sah sebagai tanda peserta ujian masuk PPDB SMP Al Amanah Tahun Pelajaran 2026/2027
             </div>
         </div>
