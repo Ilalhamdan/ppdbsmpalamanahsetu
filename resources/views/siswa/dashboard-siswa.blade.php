@@ -4587,7 +4587,7 @@
 
             // HTML format surat resmi A4 (seperti surat keterangan sekolah)
             const suratHTML = `
-    <div style="width:210mm;min-height:297mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:15mm 20mm 15mm 20mm;">
+    <div style="width:210mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:5mm 20mm 15mm 20mm;">
 
         <!-- KOP SURAT: Logo kiri + Teks kanan -->
         <div style="display:flex;align-items:center;gap:16px;padding-bottom:10px;">
