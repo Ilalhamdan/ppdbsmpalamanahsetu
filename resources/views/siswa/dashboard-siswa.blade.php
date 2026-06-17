@@ -1057,6 +1057,7 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
+
         .hamburger-btn:hover {
             background: #ccfbf1;
             border-color: #0d9488;
@@ -1068,11 +1069,14 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0, 0, 0, 0.45);
             z-index: 1039;
             backdrop-filter: blur(2px);
         }
-        .sidebar-overlay.active { display: block; }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
 
         /* ===== RESPONSIVE MOBILE ===== */
         @media (max-width: 768px) {
@@ -1084,6 +1088,7 @@
                 z-index: 1040;
                 width: 260px;
             }
+
             .sidebar.open {
                 transform: translateX(0);
                 box-shadow: 6px 0 30px rgba(0, 0, 0, 0.25);
@@ -1099,9 +1104,11 @@
                 padding: 0 1rem;
                 gap: 8px;
             }
+
             .topbar-title h1 {
                 font-size: 14px;
             }
+
             .topbar-title span {
                 font-size: 10px;
             }
@@ -1122,14 +1129,14 @@
             }
 
             /* --- Stat cards: 2 kolom di mobile --- */
-            .row.g-3 > [class*="col-lg-3"] {
+            .row.g-3>[class*="col-lg-3"] {
                 flex: 0 0 50%;
                 max-width: 50%;
             }
 
             /* --- Form grid: tumpuk di mobile --- */
-            .row > [class*="col-md"],
-            .row > [class*="col-lg"] {
+            .row>[class*="col-md"],
+            .row>[class*="col-lg"] {
                 flex: 0 0 100%;
                 max-width: 100%;
             }
@@ -1183,9 +1190,11 @@
             :root {
                 --sidebar-width: 220px;
             }
+
             .topbar-title h1 {
                 font-size: 15px;
             }
+
             .page-content {
                 padding: 1.2rem 1.25rem;
             }
@@ -1270,7 +1279,8 @@
         {{-- TOPBAR --}}
         <header class="topbar">
             {{-- Hamburger button (hanya tampil di mobile) --}}
-            <button class="hamburger-btn" id="hamburgerBtn" type="button" onclick="toggleSidebarMobile()" aria-label="Buka Menu">
+            <button class="hamburger-btn" id="hamburgerBtn" type="button" onclick="toggleSidebarMobile()"
+                aria-label="Buka Menu">
                 <i class="bi bi-list"></i>
             </button>
             <div class="topbar-title">
@@ -3941,7 +3951,7 @@
                     if (nilai.ips !== undefined && nilai.ips !== null) scores.push(nilai.ips);
                     if (nilai.mat !== undefined && nilai.mat !== null) scores.push(nilai.mat);
                     if (nilai.btq !== undefined && nilai.btq !== null) scores.push(nilai.btq);
-                    
+
                     // Backward compatibility check
                     if (scores.length === 0) {
                         if (nilai.ind !== undefined && nilai.ind !== null) scores.push(nilai.ind);
@@ -3950,7 +3960,7 @@
                         if (nilai.btq !== undefined && nilai.btq !== null) scores.push(nilai.btq);
                         if (nilai.nilai_5 !== undefined && nilai.nilai_5 !== null) scores.push(nilai.nilai_5);
                     }
-                    
+
                     const averageScore = scores.length > 0
                         ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
                         : '0.0';
@@ -4587,7 +4597,7 @@
 
             // HTML format surat resmi A4 (seperti surat keterangan sekolah)
             const suratHTML = `
-    <div style="width:210mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:5mm 20mm 15mm 20mm;">
+    <div style="width:210mm;min-height:297mm;background:#ffffff;font-family:'Times New Roman',serif;color:#000000;box-sizing:border-box;padding:15mm 20mm 15mm 20mm;">
 
         <!-- KOP SURAT: Logo kiri + Teks kanan -->
         <div style="display:flex;align-items:center;gap:16px;padding-bottom:10px;">
