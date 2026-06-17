@@ -6,6 +6,8 @@
     <title>Login - SMP AL-AMANAH</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Cloudflare Turnstile verification script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         body { 
             background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); 
@@ -126,6 +128,14 @@
                 <input type="password" name="password" class="form-control form-control-kustom @error('password') is-invalid @enderror" required placeholder="Masukkan password Anda">
                 @error('password') <span class="text-danger" style="font-size: 11px;">{{ $message }}</span> @enderror
             </div>
+
+            <!-- Cloudflare Turnstile Verification -->
+            <div class="mb-3 d-flex justify-content-center">
+                <div class="cf-turnstile" data-sitekey="{{ env('TURNSTILE_SITE_KEY', '1x00000000000000000000AA') }}" data-theme="dark"></div>
+            </div>
+            @error('cf-turnstile-response')
+                <div class="text-danger mb-3 text-start" style="font-size: 11px;">{{ $message }}</div>
+            @enderror
 
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-login">Masuk Portal</button>

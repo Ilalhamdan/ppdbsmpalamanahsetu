@@ -30,6 +30,32 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'cf-turnstile-response' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $response = \Illuminate\Support\Facades\Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                        'secret' => env('TURNSTILE_SECRET_KEY', '1x0000000000000000000000000000000AA'),
+                        'response' => $value,
+                        'remoteip' => request()->ip(),
+                    ]);
+
+                    if (!$response->json('success')) {
+                        $fail('Verifikasi keamanan gagal. Silakan coba lagi.');
+                    }
+                },
+            ],
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'cf-turnstile-response.required' => 'Verifikasi keamanan (Turnstile) wajib diselesaikan.',
         ];
     }
 
