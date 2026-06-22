@@ -85,8 +85,16 @@ Route::get('/dashboard', function () {
 // 5b. Dashboard Admin - Hanya untuk user dengan role 'admin'
 Route::get('/admin/dashboard', function () {
     $siswa = Auth::user();
-    $dbPendaftarCount = \App\Models\CalonSiswa::count();
-    return view('admin.dashboard-admin', compact('siswa', 'dbPendaftarCount'));
+    $pendaftar = \App\Models\CalonSiswa::with([
+        'user',
+        'pendaftaran.pembayaran',
+        'pendaftaran.berkas',
+    ])->whereHas('user', fn($q) => $q->where('role', 'siswa'))
+      ->orderBy('created_at', 'desc')
+      ->get();
+    $dbPendaftarCount = $pendaftar->count();
+    $sys_settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+    return view('admin.dashboard-admin', compact('siswa', 'pendaftar', 'dbPendaftarCount', 'sys_settings'));
 })->middleware(['auth', 'isAdmin'])->name('admin.dashboard');
 
 // 5c. API Kelola Home Slider (admin only)
@@ -109,6 +117,16 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->group(function () {
     // Hapus Pendaftar (admin only)
     Route::delete('/pendaftar/delete/{userId}', [\App\Http\Controllers\PendaftaranController::class, 'deletePendaftar'])->name('admin.pendaftar.delete');
 
+    // ===== VERIFIKASI FORMULIR (admin only) =====
+    Route::post('/formulir/setujui/{userId}', [\App\Http\Controllers\AdminVerifikasiController::class, 'setujuiFormulir'])->name('admin.formulir.setujui');
+    Route::post('/formulir/tolak/{userId}',   [\App\Http\Controllers\AdminVerifikasiController::class, 'tolakFormulir'])->name('admin.formulir.tolak');
+
+    // ===== VERIFIKASI BERKAS (admin only) =====
+    Route::post('/berkas/setujui/{userId}',   [\App\Http\Controllers\AdminVerifikasiController::class, 'setujuiBerkas'])->name('admin.berkas.setujui');
+    Route::post('/berkas/tolak/{userId}',     [\App\Http\Controllers\AdminVerifikasiController::class, 'tolakBerkas'])->name('admin.berkas.tolak');
+
+    // ===== NILAI UJIAN & SELEKSI (admin only) =====
+    Route::post('/seleksi/simpan-nilai/{userId}', [\App\Http\Controllers\AdminVerifikasiController::class, 'simpanNilai'])->name('admin.seleksi.simpan-nilai');
 });
 
 // 6. Logika Manajemen Akun (Bawaan Breeze)
@@ -120,6 +138,9 @@ Route::middleware('auth')->group(function () {
     // Rute Pendaftaran Calon Siswa (MySQL)
     Route::post('/pendaftaran/simpan', [\App\Http\Controllers\PendaftaranController::class, 'saveFormulir'])->name('pendaftaran.simpan');
     Route::get('/pendaftaran/data', [\App\Http\Controllers\PendaftaranController::class, 'getFormulir'])->name('pendaftaran.data');
+    Route::post('/pendaftaran/update-status-formulir', [\App\Http\Controllers\PendaftaranController::class, 'updateStatusFormulir'])->name('pendaftaran.update-status-formulir');
+    Route::post('/pendaftaran/update-status-berkas', [\App\Http\Controllers\PendaftaranController::class, 'updateStatusBerkas'])->name('pendaftaran.update-status-berkas');
+    Route::post('/pendaftaran/simpan-berkas', [\App\Http\Controllers\PendaftaranController::class, 'simpanBerkas'])->name('pendaftaran.simpan-berkas');
     
     // Rute Pembayaran (Midtrans & Manual)
     Route::post('/payment/pay', [\App\Http\Controllers\PaymentController::class, 'pay'])->name('payment.pay');

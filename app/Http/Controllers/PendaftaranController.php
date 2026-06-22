@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\CalonSiswa;
 use App\Models\DataOrangtua;
 use App\Models\Pendaftaran;
+use App\Models\Berkas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Setting;
@@ -149,13 +150,21 @@ class PendaftaranController extends Controller
             $dataKhusus = json_decode($dataKhusus, true);
         }
 
+        $pendaftaran = $calonSiswa->pendaftaran;
+
         return response()->json([
-            'success'             => true,
-            'jalur'               => $calonSiswa->pendaftaran->jurusan_pilihan ?? '',
-            'statusFormulir'      => $calonSiswa->pendaftaran ? 'Terkirim' : 'Belum',
-            'statusFormulirAdmin' => 'Menunggu',
-            'noUrut'              => $calonSiswa->pendaftaran->no_pendaftaran ?? '',
-            'tanggalDaftar'       => $calonSiswa->pendaftaran ? $calonSiswa->pendaftaran->created_at->format('d/m/Y') : '',
+            'success'              => true,
+            'jalur'                => $pendaftaran->jurusan_pilihan ?? '',
+            'statusFormulir'       => $calonSiswa->status_formulir ?? ($pendaftaran ? 'Terkirim' : 'Belum'),
+            'statusFormulirAdmin'  => $pendaftaran->status_formulir_admin ?? 'Menunggu',
+            'catatanFormulirAdmin' => $pendaftaran->catatan_formulir_admin ?? '',
+            'statusBerkas'         => $calonSiswa->status_berkas ?? 'Belum',
+            'statusBerkasAdmin'    => $pendaftaran->status_berkas_admin ?? 'Menunggu',
+            'catatanBerkasAdmin'   => $pendaftaran->catatan_berkas_admin ?? '',
+            'nilaiUjian'           => $pendaftaran->nilai_ujian ?? null,
+            'hasilSeleksi'         => $pendaftaran->hasil_seleksi ?? '',
+            'noUrut'               => $pendaftaran->no_pendaftaran ?? '',
+            'tanggalDaftar'        => $pendaftaran ? $pendaftaran->created_at->format('d/m/Y') : '',
             'formData'            => [
                 'inputNama'              => Auth::user()->name,
                 'inputGender'            => $calonSiswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
@@ -277,6 +286,76 @@ class PendaftaranController extends Controller
         $fileName = 'Data_Pendaftar_Siswa.xlsx';
         $xlsx->downloadAs($fileName);
         exit();
+    }
+
+    /**
+     * Update status formulir siswa di database (dipanggil dari dashboard siswa via JS).
+     */
+    public function updateStatusFormulir(Request $request)
+    {
+        $userId = Auth::id();
+        $calonSiswa = CalonSiswa::where('user_id', $userId)->first();
+        if (!$calonSiswa) {
+            return response()->json(['success' => false, 'message' => 'Calon siswa tidak ditemukan.'], 404);
+        }
+        $calonSiswa->update(['status_formulir' => 'Terkirim']);
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Update status berkas siswa di database (dipanggil dari dashboard siswa via JS).
+     */
+    public function updateStatusBerkas(Request $request)
+    {
+        $userId = Auth::id();
+        $calonSiswa = CalonSiswa::where('user_id', $userId)->first();
+        if (!$calonSiswa) {
+            return response()->json(['success' => false, 'message' => 'Calon siswa tidak ditemukan.'], 404);
+        }
+        $calonSiswa->update(['status_berkas' => 'Terkirim']);
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Simpan metadata berkas (nama file & tipe) ke tabel berkas.
+     */
+    public function simpanBerkas(Request $request)
+    {
+        $userId = Auth::id();
+        $calonSiswa = CalonSiswa::where('user_id', $userId)->first();
+        if (!$calonSiswa) {
+            return response()->json(['success' => false, 'message' => 'Calon siswa tidak ditemukan.'], 404);
+        }
+        $pendaftaran = Pendaftaran::where('calon_siswa_id', $calonSiswa->id)->first();
+        if (!$pendaftaran) {
+            return response()->json(['success' => false, 'message' => 'Pendaftaran tidak ditemukan.'], 404);
+        }
+
+        // Hanya simpan nama file (path) yang dikirim dari JS setelah upload
+        $fieldMap = [
+            'kk'       => 'file_kartu_keluarga',
+            'akta'     => 'file_akta_kelahiran',
+            'rapor'    => 'file_ijazah_rapor',
+            'foto'     => 'file_pas_foto',
+            'prestasi' => 'file_sertifikat_prestasi',
+            'hafalan'  => 'file_surat_hafalan',
+        ];
+
+        $data = [];
+        foreach ($fieldMap as $key => $col) {
+            if ($request->has($key)) {
+                $data[$col] = $request->input($key);
+            }
+        }
+
+        if (!empty($data)) {
+            Berkas::updateOrCreate(
+                ['pendaftaran_id' => $pendaftaran->id],
+                $data
+            );
+        }
+
+        return response()->json(['success' => true]);
     }
 
     /**

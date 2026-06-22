@@ -1930,26 +1930,65 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ==================== CONSTANTS ====================
-        const ADMIN_STATE_KEY = 'ppdb_admin_state';
         const ADMIN_NOTIF_KEY = 'ppdb_admin_notif';
         const DB_PENDAFTAR_COUNT = {{ $dbPendaftarCount ?? 0 }};
+        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        // ===== DATA PENDAFTAR: Dibaca dari PHP (database MySQL), bukan localStorage =====
+        // Setiap record mewakili satu calon siswa beserta status pendaftarannya
+        const DB_PENDAFTAR = @json(($pendaftar ?? collect())->map(function($cs) {
+            $p = $cs->pendaftaran;
+            $pb = $p?->pembayaran;
+            return [
+                'id'                  => (string) $cs->user_id,
+                'calonSiswaId'        => (string) $cs->id,
+                'nama'                => $cs->user->name ?? '',
+                'email'               => $cs->user->email ?? '',
+                'jalur'               => $p?->jurusan_pilihan ?? '',
+                'noUrut'              => $p?->no_pendaftaran ?? '',
+                'tanggalDaftar'       => $p?->tanggal_daftar
+                                          ? \Carbon\Carbon::parse($p->tanggal_daftar)->format('d/m/Y')
+                                          : ($p?->created_at ? $p->created_at->format('d/m/Y') : ''),
+                'statusFormulir'      => $cs->status_formulir ?? 'Belum',
+                'statusFormulirAdmin' => $p?->status_formulir_admin ?? 'Menunggu',
+                'catatanFormulirAdmin'=> $p?->catatan_formulir_admin ?? '',
+                'statusBerkas'        => $cs->status_berkas ?? 'Belum',
+                'statusBerkasAdmin'   => $p?->status_berkas_admin ?? 'Menunggu',
+                'catatanBerkasAdmin'  => $p?->catatan_berkas_admin ?? '',
+                'statusPembayaran'    => $pb?->status_pembayaran ?? 'Belum Bayar',
+                'catatanPembayaran'   => $pb?->catatan_pembayaran ?? '',
+                'buktiTransferManual' => $pb?->bukti_transfer_manual ?? '',
+                'namaPengirim'        => $pb?->nama_pengirim ?? '',
+                'nilaiUjian'          => $p?->nilai_ujian ?? null,
+                'hasilSeleksi'        => $p?->hasil_seleksi ?? '',
+                'formData'            => [],
+            ];
+        })->values());
+
+        // Override lokal: menyimpan perubahan status yang dilakukan admin di sesi ini
+        // (sebelum halaman di-refresh). Key = user_id
+        let _localOverride = {};
 
         let currentTolakId = null;
         let currentTolakStatus = 'Ditolak';
         let adminNotifOpen = false;
         let chartInstance = null;
         let currentActiveDetailSiswaId = null;
-        let reviewedPayments = {}; // Melacak bukti transfer yang sudah direview oleh admin pada sesi ini
+        let reviewedPayments = {};
 
         // ==================== STATE HELPERS ====================
-        function getAdminState() {
-            try { return JSON.parse(localStorage.getItem(ADMIN_STATE_KEY)) || { pendaftar: [] }; } catch (e) { return { pendaftar: [] }; }
+        // getPendaftar() sekarang membaca dari DB_PENDAFTAR (server), dengan override lokal diterapkan
+        function getPendaftar() {
+            return DB_PENDAFTAR.map(p => {
+                const ov = _localOverride[p.id] || {};
+                return Object.assign({}, p, ov);
+            });
         }
-        function saveAdminState(state) {
-            state.lastUpdated = Date.now();
-            localStorage.setItem(ADMIN_STATE_KEY, JSON.stringify(state));
+
+        // Terapkan override lokal tanpa menyimpan ke localStorage
+        function applyLocalOverride(userId, data) {
+            _localOverride[userId] = Object.assign(_localOverride[userId] || {}, data);
         }
-        function getPendaftar() { return getAdminState().pendaftar || []; }
         function getAdminNotifs() {
             try { return JSON.parse(localStorage.getItem(ADMIN_NOTIF_KEY)) || []; } catch (e) { return []; }
         }
@@ -2415,19 +2454,12 @@
             } else if (status === 'Ditolak') {
                 openTolakFormulirModal(id, nama);
             } else if (status === 'Menunggu') {
-                const adminState = getAdminState();
-                const p = adminState.pendaftar.find(x => x.id === id);
-                if (!p) return;
-                p.statusFormulirAdmin = 'Menunggu';
-                p.catatanFormulirAdmin = '';
-                saveAdminState(adminState);
-                updateSiswaState(id, { statusFormulirAdmin: 'Menunggu', catatanFormulirAdmin: '' });
-                addAdminNotif({ tipe: 'formulir_reset', pesan: 'Formulir ' + p.nama + ' dikembalikan ke status Menunggu.', emoji: '<i class="bi bi-hourglass-split text-warning"></i>' });
-                addRecentActivity({ text: 'Formulir ' + p.nama + ' di-reset', emoji: '<i class="bi bi-hourglass-split text-warning"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                // Reset ke Menunggu — simpan lokal untuk sesi ini
+                applyLocalOverride(id, { statusFormulirAdmin: 'Menunggu', catatanFormulirAdmin: '' });
+                const p = getPendaftar().find(x => x.id === id);
+                if (p) addAdminNotif({ tipe: 'formulir_reset', pesan: 'Formulir ' + p.nama + ' dikembalikan ke Menunggu.', emoji: '<i class="bi bi-hourglass-split text-warning"></i>' });
                 showToast('<i class="bi bi-hourglass-split text-warning"></i>', 'Status Di-reset', 'Status formulir dikembalikan ke Menunggu.');
-                renderVerifikasiFormulir();
-                updateDashboardStats();
-                refreshDetailModalBadges();
+                renderVerifikasiFormulir(); updateDashboardStats(); refreshDetailModalBadges();
             }
         }
 
@@ -2439,37 +2471,44 @@
             } else if (status === 'Ditolak') {
                 openTolakBerkasModal(id, nama);
             } else if (status === 'Menunggu') {
-                const adminState = getAdminState();
-                const p = adminState.pendaftar.find(x => x.id === id);
-                if (!p) return;
-                p.statusBerkasAdmin = 'Menunggu';
-                p.catatanBerkasAdmin = '';
-                saveAdminState(adminState);
-                updateSiswaState(id, { statusBerkasAdmin: 'Menunggu', catatanBerkasAdmin: '' });
-                addAdminNotif({ tipe: 'berkas_reset', pesan: 'Berkas ' + p.nama + ' dikembalikan ke status Menunggu.', emoji: '<i class="bi bi-hourglass-split text-warning"></i>' });
-                addRecentActivity({ text: 'Berkas ' + p.nama + ' di-reset', emoji: '<i class="bi bi-hourglass-split text-warning"></i>', time: new Date().toLocaleTimeString('id-ID') });
-                showToast('<i class="bi bi-hourglass-split text-warning"></i>', 'Status Di-reset', 'Status berkas dikembalikan ke Menunggu.');
-                renderVerifikasiBerkas();
-                updateDashboardStats();
-                refreshDetailModalBadges();
+                fetch('/admin/berkas/reset/' + id, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        applyLocalOverride(id, { statusBerkasAdmin: 'Menunggu', catatanBerkasAdmin: '' });
+                        const p = getPendaftar().find(x => x.id === id);
+                        if (p) addAdminNotif({ tipe: 'berkas_reset', pesan: 'Berkas ' + p.nama + ' dikembalikan ke Menunggu.', emoji: '<i class="bi bi-hourglass-split text-warning"></i>' });
+                        showToast('<i class="bi bi-hourglass-split text-warning"></i>', 'Status Di-reset', 'Status berkas dikembalikan ke Menunggu.');
+                        renderVerifikasiBerkas(); updateDashboardStats(); refreshDetailModalBadges();
+                    }
+                });
             }
         }
 
         // ==================== ACTIONS: SETUJUI / BELUM VALID / TOLAK ====================
         function setujuiFormulir(id) {
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === id);
+            const p = getPendaftar().find(x => x.id === id);
             if (!p) return;
-            p.statusFormulirAdmin = 'Disetujui';
-            p.catatanFormulirAdmin = '';
-            saveAdminState(adminState);
-            updateSiswaState(id, { statusFormulirAdmin: 'Disetujui', catatanFormulirAdmin: '' });
-            addAdminNotif({ tipe: 'formulir_setujui', pesan: 'Formulir ' + p.nama + ' berhasil disetujui.', emoji: '<i class="bi bi-check-circle-fill text-success"></i>' });
-            addRecentActivity({ text: 'Formulir ' + p.nama + ' disetujui', emoji: '<i class="bi bi-check-circle-fill text-success"></i>', time: new Date().toLocaleTimeString('id-ID') });
-            showToast('<i class="bi bi-check-circle-fill text-success"></i>', 'Formulir Disetujui', 'Notifikasi dikirim ke ' + p.nama);
-            renderVerifikasiFormulir();
-            updateDashboardStats();
-            refreshDetailModalBadges();
+            fetch('/admin/formulir/setujui/' + id, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    applyLocalOverride(id, { statusFormulirAdmin: 'Disetujui', catatanFormulirAdmin: '' });
+                    addAdminNotif({ tipe: 'formulir_setujui', pesan: 'Formulir ' + p.nama + ' berhasil disetujui.', emoji: '<i class="bi bi-check-circle-fill text-success"></i>' });
+                    addRecentActivity({ text: 'Formulir ' + p.nama + ' disetujui', emoji: '<i class="bi bi-check-circle-fill text-success"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                    showToast('<i class="bi bi-check-circle-fill text-success"></i>', 'Formulir Disetujui', 'Notifikasi terkirim ke ' + p.nama);
+                    renderVerifikasiFormulir(); updateDashboardStats(); refreshDetailModalBadges();
+                } else {
+                    alert('Gagal menyetujui formulir: ' + (data.message || 'Terjadi kesalahan'));
+                }
+            })
+            .catch(() => alert('Koneksi gagal saat menyetujui formulir.'));
         }
 
         function belumValidFormulir(id, nama) {
@@ -2492,37 +2531,51 @@
             const catatan = document.getElementById('inputCatatanFormulir').value.trim();
             if (!catatan) { document.getElementById('inputCatatanFormulir').style.borderColor = '#ef4444'; return; }
 
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === currentTolakId);
+            const p = getPendaftar().find(x => x.id === currentTolakId);
             if (!p) return;
             const newStatus = currentTolakStatus || 'Ditolak';
-            p.statusFormulirAdmin = newStatus;
-            p.catatanFormulirAdmin = catatan;
-            saveAdminState(adminState);
-            updateSiswaState(currentTolakId, { statusFormulirAdmin: newStatus, catatanFormulirAdmin: catatan, statusFormulir: 'Belum' });
-            addAdminNotif({ tipe: 'formulir_tolak', pesan: 'Formulir ' + p.nama + ' ' + newStatus + ': ' + catatan.substring(0, 50), emoji: newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>' });
-            addRecentActivity({ text: 'Formulir ' + p.nama + ': ' + newStatus, emoji: newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
-            closeTolakFormulirModal();
-            showToast(newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>', 'Formulir ' + newStatus, 'Catatan dikirim ke ' + p.nama);
-            renderVerifikasiFormulir();
-            updateDashboardStats();
-            refreshDetailModalBadges();
+
+            fetch('/admin/formulir/tolak/' + currentTolakId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                body: JSON.stringify({ catatan: catatan })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    applyLocalOverride(currentTolakId, { statusFormulirAdmin: newStatus, catatanFormulirAdmin: catatan, statusFormulir: 'Belum' });
+                    addAdminNotif({ tipe: 'formulir_tolak', pesan: 'Formulir ' + p.nama + ' ' + newStatus + ': ' + catatan.substring(0, 50), emoji: newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>' });
+                    addRecentActivity({ text: 'Formulir ' + p.nama + ': ' + newStatus, emoji: '<i class="bi bi-x-circle-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                    closeTolakFormulirModal();
+                    showToast(newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>', 'Formulir ' + newStatus, 'Catatan dikirim ke ' + p.nama);
+                    renderVerifikasiFormulir(); updateDashboardStats(); refreshDetailModalBadges();
+                } else {
+                    alert('Gagal menolak formulir: ' + (data.message || 'Terjadi kesalahan'));
+                }
+            })
+            .catch(() => alert('Koneksi gagal saat menolak formulir.'));
         }
 
         function setujuiBerkas(id) {
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === id);
+            const p = getPendaftar().find(x => x.id === id);
             if (!p) return;
-            p.statusBerkasAdmin = 'Disetujui';
-            p.catatanBerkasAdmin = '';
-            saveAdminState(adminState);
-            updateSiswaState(id, { statusBerkasAdmin: 'Disetujui', catatanBerkasAdmin: '' });
-            addAdminNotif({ tipe: 'berkas_setujui', pesan: 'Berkas ' + p.nama + ' disetujui!', emoji: '<i class="bi bi-folder-fill text-warning"></i>' });
-            addRecentActivity({ text: 'Berkas ' + p.nama + ' disetujui', emoji: '<i class="bi bi-folder-fill text-warning"></i>', time: new Date().toLocaleTimeString('id-ID') });
-            showToast('<i class="bi bi-folder-fill text-warning"></i>', 'Berkas Disetujui', p.nama + ' — berkas valid');
-            renderVerifikasiBerkas();
-            updateDashboardStats();
-            refreshDetailModalBadges();
+            fetch('/admin/berkas/setujui/' + id, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    applyLocalOverride(id, { statusBerkasAdmin: 'Disetujui', catatanBerkasAdmin: '' });
+                    addAdminNotif({ tipe: 'berkas_setujui', pesan: 'Berkas ' + p.nama + ' disetujui!', emoji: '<i class="bi bi-folder-fill text-warning"></i>' });
+                    addRecentActivity({ text: 'Berkas ' + p.nama + ' disetujui', emoji: '<i class="bi bi-folder-fill text-warning"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                    showToast('<i class="bi bi-folder-fill text-warning"></i>', 'Berkas Disetujui', p.nama + ' — berkas valid');
+                    renderVerifikasiBerkas(); updateDashboardStats(); refreshDetailModalBadges();
+                } else {
+                    alert('Gagal menyetujui berkas: ' + (data.message || 'Terjadi kesalahan'));
+                }
+            })
+            .catch(() => alert('Koneksi gagal saat menyetujui berkas.'));
         }
 
         function belumValidBerkas(id, nama) {
@@ -2544,56 +2597,52 @@
             const catatan = document.getElementById('inputCatatanBerkas').value.trim();
             if (!catatan) { document.getElementById('inputCatatanBerkas').style.borderColor = '#ef4444'; return; }
 
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === currentTolakId);
+            const p = getPendaftar().find(x => x.id === currentTolakId);
             if (!p) return;
             const newStatus = currentTolakStatus || 'Ditolak';
-            p.statusBerkasAdmin = newStatus;
-            p.catatanBerkasAdmin = catatan;
-            saveAdminState(adminState);
-            updateSiswaState(currentTolakId, { statusBerkasAdmin: newStatus, catatanBerkasAdmin: catatan, statusBerkas: 'Belum' });
-            addAdminNotif({ tipe: 'berkas_tolak', pesan: 'Berkas ' + p.nama + ' ' + newStatus + ': ' + catatan.substring(0, 50), emoji: newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>' });
-            addRecentActivity({ text: 'Berkas ' + p.nama + ': ' + newStatus, emoji: newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
-            closeTolakBerkasModal();
-            showToast(newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>', 'Berkas ' + newStatus, 'Catatan dikirim ke ' + p.nama);
-            renderVerifikasiBerkas();
-            updateDashboardStats();
-            refreshDetailModalBadges();
+
+            fetch('/admin/berkas/tolak/' + currentTolakId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                body: JSON.stringify({ catatan: catatan })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    applyLocalOverride(currentTolakId, { statusBerkasAdmin: newStatus, catatanBerkasAdmin: catatan, statusBerkas: 'Belum' });
+                    addAdminNotif({ tipe: 'berkas_tolak', pesan: 'Berkas ' + p.nama + ' ' + newStatus + ': ' + catatan.substring(0, 50), emoji: newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>' });
+                    addRecentActivity({ text: 'Berkas ' + p.nama + ': ' + newStatus, emoji: '<i class="bi bi-x-circle-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                    closeTolakBerkasModal();
+                    showToast(newStatus === 'Belum Valid' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>', 'Berkas ' + newStatus, 'Catatan dikirim ke ' + p.nama);
+                    renderVerifikasiBerkas(); updateDashboardStats(); refreshDetailModalBadges();
+                } else {
+                    alert('Gagal menolak berkas: ' + (data.message || 'Terjadi kesalahan'));
+                }
+            })
+            .catch(() => alert('Koneksi gagal saat menolak berkas.'));
         }
 
         function konfirmasiPembayaran(id) {
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === id);
+            const p = getPendaftar().find(x => x.id === id);
             if (!p) return;
 
-            // Call backend to update database status to Lunas
             fetch('/admin/payment/confirm-lunas/' + id, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    applyLocalOverride(id, { statusPembayaran: 'Lunas', catatanPembayaran: '' });
+                    addAdminNotif({ tipe: 'pembayaran_lunas', pesan: 'Pembayaran ' + p.nama + ' dikonfirmasi lunas.', emoji: '<i class="bi bi-credit-card-fill text-primary"></i>' });
+                    addRecentActivity({ text: 'Pembayaran ' + p.nama + ' dikonfirmasi lunas', emoji: '<i class="bi bi-credit-card-fill text-primary"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                    showToast('<i class="bi bi-credit-card-fill text-primary"></i>', 'Pembayaran Dikonfirmasi!', p.nama + ' — Kartu ujian terbuka!');
+                    renderPembayaran(); updateDashboardStats();
+                } else {
+                    alert('Gagal mengonfirmasi pembayaran: ' + (data.error || 'Terjadi kesalahan'));
                 }
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        p.statusPembayaran = 'Lunas';
-                        p.catatanPembayaran = '';
-                        saveAdminState(adminState);
-                        updateSiswaState(id, { statusPembayaran: 'Lunas', catatanPembayaran: '' });
-                        addAdminNotif({ tipe: 'pembayaran_lunas', pesan: 'Pembayaran ' + p.nama + ' dikonfirmasi lunas. Akses cetak kartu terbuka!', emoji: '<i class="bi bi-credit-card-fill text-primary"></i>' });
-                        addRecentActivity({ text: 'Pembayaran ' + p.nama + ' dikonfirmasi lunas', emoji: '<i class="bi bi-credit-card-fill text-primary"></i>', time: new Date().toLocaleTimeString('id-ID') });
-                        showToast('<i class="bi bi-credit-card-fill text-primary"></i>', 'Pembayaran Dikonfirmasi!', p.nama + ' — Kartu ujian terbuka!');
-                        renderPembayaran();
-                        updateDashboardStats();
-                    } else {
-                        alert('Gagal mengonfirmasi pembayaran: ' + (data.error || 'Terjadi kesalahan'));
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Terjadi kesalahan koneksi saat mengonfirmasi pembayaran.');
-                });
+            .catch(() => alert('Terjadi kesalahan koneksi saat mengonfirmasi pembayaran.'));
         }
 
         let currentPembayaranTolakId = null;
@@ -2612,40 +2661,28 @@
             const catatan = document.getElementById('inputCatatanPembayaran').value.trim();
             if (!catatan) { document.getElementById('inputCatatanPembayaran').style.borderColor = '#ef4444'; return; }
 
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === currentPembayaranTolakId);
+            const p = getPendaftar().find(x => x.id === currentPembayaranTolakId);
             if (!p) return;
 
-            // Call backend to update database status to Belum Bayar with a note
             fetch('/admin/payment/reject/' + currentPembayaranTolakId, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                 body: JSON.stringify({ catatan: catatan })
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        p.statusPembayaran = 'Belum Bayar';
-                        p.catatanPembayaran = catatan;
-                        saveAdminState(adminState);
-                        updateSiswaState(currentPembayaranTolakId, { statusPembayaran: 'Belum Bayar', catatanPembayaran: catatan });
-                        addAdminNotif({ tipe: 'pembayaran_tolak', pesan: 'Pembayaran ' + p.nama + ' ditolak: ' + catatan.substring(0, 50), emoji: '<i class="bi bi-x-circle-fill text-danger"></i>' });
-                        addRecentActivity({ text: 'Pembayaran ' + p.nama + ' ditolak', emoji: '<i class="bi bi-x-circle-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
-                        closeTolakPembayaranModal();
-                        showToast('<i class="bi bi-x-circle-fill text-danger"></i>', 'Pembayaran Ditolak', 'Catatan terkirim ke ' + p.nama);
-                        renderPembayaran();
-                        updateDashboardStats();
-                    } else {
-                        alert('Gagal menolak pembayaran: ' + (data.error || 'Terjadi kesalahan'));
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Terjadi kesalahan koneksi saat memproses penolakan pembayaran.');
-                });
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    applyLocalOverride(currentPembayaranTolakId, { statusPembayaran: 'Belum Bayar', catatanPembayaran: catatan });
+                    addAdminNotif({ tipe: 'pembayaran_tolak', pesan: 'Pembayaran ' + p.nama + ' ditolak: ' + catatan.substring(0, 50), emoji: '<i class="bi bi-x-circle-fill text-danger"></i>' });
+                    addRecentActivity({ text: 'Pembayaran ' + p.nama + ' ditolak', emoji: '<i class="bi bi-x-circle-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
+                    closeTolakPembayaranModal();
+                    showToast('<i class="bi bi-x-circle-fill text-danger"></i>', 'Pembayaran Ditolak', 'Catatan terkirim ke ' + p.nama);
+                    renderPembayaran(); updateDashboardStats();
+                } else {
+                    alert('Gagal menolak pembayaran: ' + (data.error || 'Terjadi kesalahan'));
+                }
+            })
+            .catch(() => alert('Terjadi kesalahan koneksi saat memproses penolakan pembayaran.'));
         }
 
         function ubahStatusPembayaranManual(id, status) {
@@ -2670,49 +2707,20 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    // Hapus data dari localStorage adminState (berlaku untuk database maupun data mock)
-                    const adminState = getAdminState();
-                    adminState.pendaftar = (adminState.pendaftar || []).filter(x => x.id !== id);
-                    saveAdminState(adminState);
+                    // Hapus data dari override lokal
+                    delete _localOverride[id];
 
-                    // Hapus data lokal siswa bersangkutan
-                    localStorage.removeItem('ppdbState_' + id);
-                    localStorage.removeItem('ppdbNotif_' + id);
-                    localStorage.removeItem('ppdb_admin_seen_' + id);
-
-                    // Notifikasi sukses
+                    // Reload halaman agar data DB terupdate (data sudah dihapus dari server)
                     addAdminNotif({ tipe: 'pendaftar_dihapus', pesan: 'Data pendaftar ' + nama + ' telah dihapus permanen.', emoji: '<i class="bi bi-trash-fill text-danger"></i>' });
                     addRecentActivity({ text: 'Menghapus pendaftar: ' + nama, emoji: '<i class="bi bi-trash-fill text-danger"></i>', time: new Date().toLocaleTimeString('id-ID') });
                     showToast('<i class="bi bi-trash-fill text-danger"></i>', 'Data Dihapus!', 'Data calon siswa ' + nama + ' telah dihapus.');
 
-                    // Rerender seluruh panel dashboard
-                    renderTablePendaftar();
-                    renderVerifikasiFormulir();
-                    renderVerifikasiBerkas();
-                    renderPembayaran();
-                    renderSeleksi();
-                    updateDashboardStats();
-                    renderChart();
+                    // Reload halaman setelah 1,5 detik agar DB_PENDAFTAR diperbarui
+                    setTimeout(() => location.reload(), 1500);
                 })
                 .catch(err => {
                     console.error(err);
-                    // Fallback jika tidak ada koneksi/tidak ada di DB (misal data mock Luthfi Safitri)
-                    const adminState = getAdminState();
-                    adminState.pendaftar = (adminState.pendaftar || []).filter(x => x.id !== id);
-                    saveAdminState(adminState);
-                    localStorage.removeItem('ppdbState_' + id);
-                    localStorage.removeItem('ppdbNotif_' + id);
-                    localStorage.removeItem('ppdb_admin_seen_' + id);
-
-                    showToast('<i class="bi bi-trash-fill text-danger"></i>', 'Data Dihapus!', 'Data calon siswa ' + nama + ' telah dihapus.');
-
-                    renderTablePendaftar();
-                    renderVerifikasiFormulir();
-                    renderVerifikasiBerkas();
-                    renderPembayaran();
-                    renderSeleksi();
-                    updateDashboardStats();
-                    renderChart();
+                    alert('Gagal menghapus data. Pastikan server berjalan dan coba lagi.');
                 });
         }
 
@@ -2721,8 +2729,7 @@
         function openCatatanModal(id, nama, type) {
             currentCatatanId = id;
             currentCatatanType = type;
-            const adminState = getAdminState();
-            const p = adminState.pendaftar.find(x => x.id === id);
+            const p = getPendaftar().find(x => x.id === id);
             const existingCatatan = type === 'formulir' ? (p?.catatanFormulirAdmin || '') : (p?.catatanBerkasAdmin || '');
             const modal = document.getElementById('modalKirimCatatan');
             const nameEl = document.getElementById('catatanNama');

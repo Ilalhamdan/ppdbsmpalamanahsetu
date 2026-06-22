@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Berkas extends Model
 {
-    //
+    protected $guarded = [];
+
+    public function pendaftaran()
+    {
+        return $this->belongsTo(Pendaftaran::class);
+    }
 }

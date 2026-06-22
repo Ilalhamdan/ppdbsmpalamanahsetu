@@ -12,4 +12,14 @@ class Pendaftaran extends Model
     {
         return $this->belongsTo(CalonSiswa::class);
     }
+
+    public function pembayaran()
+    {
+        return $this->hasOne(Pembayaran::class);
+    }
+
+    public function berkas()
+    {
+        return $this->hasOne(Berkas::class);
+    }
 }
