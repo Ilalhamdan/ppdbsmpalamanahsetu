@@ -3235,9 +3235,15 @@
                         setState({
                             jalur: res.jalur,
                             statusFormulir: res.statusFormulir,
+                            statusBerkas: res.statusBerkas,
+                            statusBerkasAdmin: res.statusBerkasAdmin,
+                            catatanBerkasAdmin: res.catatanBerkasAdmin,
+                            statusFormulirAdmin: res.statusFormulirAdmin,
+                            catatanFormulirAdmin: res.catatanFormulirAdmin,
                             noUrut: res.noUrut,
                             tanggalDaftar: res.tanggalDaftar,
-                            formData: res.formData
+                            formData: res.formData,
+                            uploadedFiles: res.uploadedFiles || {}
                         });
 
                         // Tampilkan ke input form
@@ -3458,18 +3464,27 @@
 
         function previewBerkas(type) {
             const entry = getBerkasFile(type);
-            if (!entry || !entry.objectUrl) {
-                showPopup('<i class="bi bi-info-circle-fill fs-3" style="color:#0ea5e9"></i>',
-                    'Pilih File Dulu',
-                    'Berkas ini belum dipilih di sesi ini. Klik <b>Ganti</b> dan pilih file kembali untuk preview.',
-                    '#e0f2fe', '#0369a1');
+            if (entry && entry.objectUrl) {
+                const newTab = window.open(entry.objectUrl, '_blank');
+                if (!newTab) {
+                    showPopup('<i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>', 'Pop-up Diblokir', 'Izinkan pop-up untuk domain ini di browser, lalu coba lagi.', '#fef9c3', '#d97706');
+                    setTimeout(closeStatusPopup, 3000);
+                }
                 return;
             }
-            const newTab = window.open(entry.objectUrl, '_blank');
-            if (!newTab) {
-                showPopup('<i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>', 'Pop-up Diblokir', 'Izinkan pop-up untuk domain ini di browser, lalu coba lagi.', '#fef9c3', '#d97706');
-                setTimeout(closeStatusPopup, 3000);
+
+            // Jika file tidak ada di memory browser ini, tapi ada di state uploadedFiles (URL server)
+            const uploaded = getState().uploadedFiles || {};
+            const meta = uploaded[type];
+            if (meta && meta.url) {
+                window.open(meta.url, '_blank');
+                return;
             }
+
+            showPopup('<i class="bi bi-info-circle-fill fs-3" style="color:#0ea5e9"></i>',
+                'Pilih File Dulu',
+                'Berkas ini belum dipilih di sesi ini. Klik <b>Ganti</b> dan pilih file kembali untuk preview.',
+                '#e0f2fe', '#0369a1');
         }
 
         function markBerkasUploaded(type, hasFile) {
@@ -3519,7 +3534,8 @@
 
             const pEl = document.getElementById(previewBtnMap[type]);
             if (pEl) {
-                const inMemory = hasFile === true || !!getBerkasFile(type);
+                const hasServerUrl = !!(meta && meta.url);
+                const inMemory = hasFile === true || !!getBerkasFile(type) || hasServerUrl;
                 if (inMemory) pEl.classList.remove('d-none');
             }
 

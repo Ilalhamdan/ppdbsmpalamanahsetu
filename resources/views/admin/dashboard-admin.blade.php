@@ -3439,10 +3439,11 @@
 
         <div class="d-flex flex-column gap-2">
             ${Object.keys(uf).filter(k => uf[k]).map(k => {
-                // uf[k] is now an object { name, mime, size } or legacy boolean true
-                const meta = (typeof uf[k] === 'object') ? uf[k] : null;
-                const fileName = meta ? meta.name : '';
-                const fileMime = meta ? meta.mime : '';
+                // uf[k] is now a string URL (from server) or an object { name, mime, size } or legacy boolean true
+                const isUrl = typeof uf[k] === 'string';
+                const meta = (!isUrl && typeof uf[k] === 'object') ? uf[k] : null;
+                const fileName = isUrl ? uf[k].substring(uf[k].lastIndexOf('/') + 1) : (meta ? meta.name : '');
+                const fileMime = isUrl ? (uf[k].toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg') : (meta ? meta.mime : '');
                 const isPdf = fileMime === 'application/pdf';
                 const iconClass = isPdf ? 'bi-file-earmark-pdf text-danger' : 'bi-file-earmark-image text-primary';
                 return `
@@ -3471,7 +3472,7 @@
 
         <div class="mt-3 p-2 rounded-2" style="background:#f0fdf4;border:1px solid #bbf7d0;font-size:11px;color:#166534;">
             <i class="bi bi-info-circle me-1"></i>
-            <strong>Info:</strong> Berkas tersimpan dengan aman di database browser IndexedDB. Anda dapat langsung melihat (Review) di tab baru atau mengunduhnya (Unduh) untuk kebutuhan pemberkasan sekolah.
+            <strong>Info:</strong> Berkas siswa disimpan secara aman di penyimpanan server. Anda dapat meninjau langsung secara online (Review) atau mengunduhnya (Unduh).
         </div>
     </div>
     `;
@@ -3481,6 +3482,15 @@
         }
 
         function adminPreviewFile(siswaId, type) {
+            const p = getPendaftar().find(x => x.id === siswaId);
+            const uf = p ? (p.uploadedFiles || {}) : {};
+            const fileUrl = uf[type];
+
+            if (typeof fileUrl === 'string') {
+                window.open(fileUrl, '_blank');
+                return;
+            }
+
             getFileDB(siswaId + '_' + type).then(entry => {
                 if (!entry || !entry.fileBlob) {
                     alert('File belum tersedia di browser ini.\n\nPenyebab:\n• Siswa mengunggah berkas menggunakan perangkat/browser lain, atau\n• Data file di browser ini telah terhapus.\n\nPastikan proses simulasi dilakukan pada browser yang sama.');
@@ -3505,6 +3515,20 @@
         }
 
         function adminDownloadFile(siswaId, type) {
+            const p = getPendaftar().find(x => x.id === siswaId);
+            const uf = p ? (p.uploadedFiles || {}) : {};
+            const fileUrl = uf[type];
+
+            if (typeof fileUrl === 'string') {
+                const a = document.createElement('a');
+                a.href = fileUrl;
+                a.download = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                return;
+            }
+
             getFileDB(siswaId + '_' + type).then(entry => {
                 if (!entry || !entry.fileBlob) {
                     alert('File tidak ditemukan.');

@@ -152,6 +152,47 @@ class PendaftaranController extends Controller
 
         $pendaftaran = $calonSiswa->pendaftaran;
 
+        $bk = Berkas::where('pendaftaran_id', $pendaftaran->id)->first();
+        $uploadedFiles = [];
+        if ($bk) {
+            if ($bk->file_kartu_keluarga) $uploadedFiles['KK'] = [
+                'name' => basename($bk->file_kartu_keluarga),
+                'mime' => $bk->file_kartu_keluarga ? (str_ends_with(strtolower($bk->file_kartu_keluarga), '.pdf') ? 'application/pdf' : 'image/jpeg') : '',
+                'size' => 0,
+                'url'  => asset('storage/' . $bk->file_kartu_keluarga)
+            ];
+            if ($bk->file_akta_kelahiran) $uploadedFiles['Akta'] = [
+                'name' => basename($bk->file_akta_kelahiran),
+                'mime' => $bk->file_akta_kelahiran ? (str_ends_with(strtolower($bk->file_akta_kelahiran), '.pdf') ? 'application/pdf' : 'image/jpeg') : '',
+                'size' => 0,
+                'url'  => asset('storage/' . $bk->file_akta_kelahiran)
+            ];
+            if ($bk->file_ijazah_rapor) $uploadedFiles['Rapor'] = [
+                'name' => basename($bk->file_ijazah_rapor),
+                'mime' => $bk->file_ijazah_rapor ? (str_ends_with(strtolower($bk->file_ijazah_rapor), '.pdf') ? 'application/pdf' : 'image/jpeg') : '',
+                'size' => 0,
+                'url'  => asset('storage/' . $bk->file_ijazah_rapor)
+            ];
+            if ($bk->file_pas_foto) $uploadedFiles['Foto'] = [
+                'name' => basename($bk->file_pas_foto),
+                'mime' => $bk->file_pas_foto ? (str_ends_with(strtolower($bk->file_pas_foto), '.pdf') ? 'application/pdf' : 'image/jpeg') : '',
+                'size' => 0,
+                'url'  => asset('storage/' . $bk->file_pas_foto)
+            ];
+            if ($bk->file_sertifikat_prestasi) $uploadedFiles['Sertifikat'] = [
+                'name' => basename($bk->file_sertifikat_prestasi),
+                'mime' => $bk->file_sertifikat_prestasi ? (str_ends_with(strtolower($bk->file_sertifikat_prestasi), '.pdf') ? 'application/pdf' : 'image/jpeg') : '',
+                'size' => 0,
+                'url'  => asset('storage/' . $bk->file_sertifikat_prestasi)
+            ];
+            if ($bk->file_surat_hafalan) $uploadedFiles['KetHafalan'] = [
+                'name' => basename($bk->file_surat_hafalan),
+                'mime' => $bk->file_surat_hafalan ? (str_ends_with(strtolower($bk->file_surat_hafalan), '.pdf') ? 'application/pdf' : 'image/jpeg') : '',
+                'size' => 0,
+                'url'  => asset('storage/' . $bk->file_surat_hafalan)
+            ];
+        }
+
         return response()->json([
             'success'              => true,
             'jalur'                => $pendaftaran->jurusan_pilihan ?? '',
@@ -165,6 +206,7 @@ class PendaftaranController extends Controller
             'hasilSeleksi'         => $pendaftaran->hasil_seleksi ?? '',
             'noUrut'               => $pendaftaran->no_pendaftaran ?? '',
             'tanggalDaftar'        => $pendaftaran ? $pendaftaran->created_at->format('d/m/Y') : '',
+            'uploadedFiles'        => $uploadedFiles,
             'formData'            => [
                 'inputNama'              => Auth::user()->name,
                 'inputGender'            => $calonSiswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
