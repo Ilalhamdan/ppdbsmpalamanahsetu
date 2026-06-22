@@ -18,6 +18,16 @@ Route::get('/', function () {
     return view('landing', compact('sliders'));
 });
 
+// Route Darurat untuk menjalankan migrate di production (karena terminal Railway tidak bisa/bermasalah)
+Route::get('/run-migration', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response('Migrasi berhasil dijalankan! Output: <br>' . nl2br(\Illuminate\Support\Facades\Artisan::output()));
+    } catch (\Exception $e) {
+        return response('Migrasi gagal: ' . $e->getMessage());
+    }
+});
+
 // 2. Rute Navigasi Menu Profil Sekolah (Mendukung Tab Sejarah, Visi-Misi, Fasilitas, Ekstrakurikuler, Prestasi)
 Route::get('/profil', function () {
     return view('profil', ['tab' => 'sejarah']); // Standar awal membuka sejarah
