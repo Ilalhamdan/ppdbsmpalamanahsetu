@@ -331,7 +331,6 @@ class PendaftaranController extends Controller
             return response()->json(['success' => false, 'message' => 'Pendaftaran tidak ditemukan.'], 404);
         }
 
-        // Hanya simpan nama file (path) yang dikirim dari JS setelah upload
         $fieldMap = [
             'kk'       => 'file_kartu_keluarga',
             'akta'     => 'file_akta_kelahiran',
@@ -343,8 +342,9 @@ class PendaftaranController extends Controller
 
         $data = [];
         foreach ($fieldMap as $key => $col) {
-            if ($request->has($key)) {
-                $data[$col] = $request->input($key);
+            if ($request->hasFile($key)) {
+                $path = $request->file($key)->store('berkas_siswa', 'public');
+                $data[$col] = $path;
             }
         }
 
@@ -353,6 +353,12 @@ class PendaftaranController extends Controller
                 ['pendaftaran_id' => $pendaftaran->id],
                 $data
             );
+        }
+
+        // Set status berkas ke Terkirim jika tombol submit ditekan
+        if ($request->input('submit') === 'true') {
+            $calonSiswa->update(['status_berkas' => 'Terkirim']);
+            $pendaftaran->update(['status_berkas_admin' => 'Menunggu']);
         }
 
         return response()->json(['success' => true]);

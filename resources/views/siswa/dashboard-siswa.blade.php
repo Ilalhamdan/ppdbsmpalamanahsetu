@@ -3421,13 +3421,39 @@
                 reader.readAsDataURL(file);
             }
 
-            // Store only metadata in localStorage (not the file data itself)
-            const uploadedFiles = getState().uploadedFiles || {};
-            uploadedFiles[type] = { name: file.name, mime: file.type, size: file.size };
-            setState({ uploadedFiles: uploadedFiles });
-            markBerkasUploaded(type, true);
-            checkBerkasComplete();
-            syncToAdminPanel();
+            // Backend keys map
+            const fileKeyMap = {
+                'KK': 'kk', 'Akta': 'akta', 'Rapor': 'rapor',
+                'Foto': 'foto', 'Sertifikat': 'prestasi', 'KetHafalan': 'hafalan', 'KetLembaga': 'lembaga', 'Rekomen': 'rekomen'
+            };
+
+            const formData = new FormData();
+            formData.append(fileKeyMap[type], file);
+
+            // Upload ke backend
+            fetch('/pendaftaran/simpan-berkas', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    // Store only metadata in localStorage (not the file data itself)
+                    const uploadedFiles = getState().uploadedFiles || {};
+                    uploadedFiles[type] = { name: file.name, mime: file.type, size: file.size };
+                    setState({ uploadedFiles: uploadedFiles });
+                    markBerkasUploaded(type, true);
+                    checkBerkasComplete();
+                    syncToAdminPanel();
+                } else {
+                    alert('Gagal mengunggah file: ' + res.message);
+                }
+            }).catch(err => {
+                alert('Gagal mengunggah file. Periksa koneksi Anda.');
+            });
         }
 
         function previewBerkas(type) {
@@ -3533,12 +3559,41 @@
                 setTimeout(closeStatusPopup, 2200);
                 return;
             }
-            setState({ statusBerkas: 'Terkirim', statusBerkasAdmin: 'Menunggu' });
-            syncToAdminPanel();
-            addNotif({ tipe: 'berkas_terkirim', pesan: 'Berkas persyaratan Anda telah berhasil dikirim ke panitia. Tunggu verifikasi.', emoji: '<i class="bi bi-folder-fill text-warning"></i>' });
+            const btn = document.getElementById('btnSubmitBerkas');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i> Mengirim...';
+            btn.disabled = true;
 
-            showPopup('<i class="bi bi-check-circle-fill fs-3 text-success"></i>', 'Berkas Berhasil Dikirim!', 'Berkas Anda sedang diverifikasi oleh Panitia PPDB. Kami akan memberi notifikasi segera setelah selesai.', '#dcfce7', '#16a34a');
-            setTimeout(() => { closeStatusPopup(); switchSection('Dashboard'); updateDashboardUI(); }, 2000);
+            const formData = new FormData();
+            formData.append('submit', 'true');
+
+            fetch('/pendaftaran/simpan-berkas', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if (res.success) {
+                    setState({ statusBerkas: 'Terkirim', statusBerkasAdmin: 'Menunggu' });
+                    syncToAdminPanel();
+                    addNotif({ tipe: 'berkas_terkirim', pesan: 'Berkas persyaratan Anda telah berhasil dikirim ke panitia. Tunggu verifikasi.', emoji: '<i class="bi bi-folder-fill text-warning"></i>' });
+
+                    showPopup('<i class="bi bi-check-circle-fill fs-3 text-success"></i>', 'Berkas Berhasil Dikirim!', 'Berkas Anda sedang diverifikasi oleh Panitia PPDB. Kami akan memberi notifikasi segera setelah selesai.', '#dcfce7', '#16a34a');
+                    setTimeout(() => { closeStatusPopup(); switchSection('Dashboard'); updateDashboardUI(); }, 2000);
+                } else {
+                    showPopup('<i class="bi bi-x-circle-fill fs-3 text-danger"></i>', 'Gagal Mengirim', res.message || 'Terjadi kesalahan.', '#fef2f2', '#dc2626');
+                }
+            })
+            .catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showPopup('<i class="bi bi-x-circle-fill fs-3 text-danger"></i>', 'Error Koneksi', 'Gagal terhubung ke server. Coba lagi.', '#fef2f2', '#dc2626');
+            });
         }
 
         // ==================== CETAK KARTU UI ====================
