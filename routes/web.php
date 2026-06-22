@@ -37,6 +37,16 @@ Route::get('/reset-db', function () {
     }
 });
 
+// Route Darurat untuk mengembalikan akun admin jika terhapus tanpa mereset seluruh database
+Route::get('/restore-admin', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'DatabaseSeeder', '--force' => true]);
+        return response('Akun admin berhasil dipulihkan! Anda sekarang bisa login kembali.');
+    } catch (\Exception $e) {
+        return response('Gagal memulihkan admin: ' . $e->getMessage());
+    }
+});
+
 // 2. Rute Navigasi Menu Profil Sekolah (Mendukung Tab Sejarah, Visi-Misi, Fasilitas, Ekstrakurikuler, Prestasi)
 Route::get('/profil', function () {
     return view('profil', ['tab' => 'sejarah']); // Standar awal membuka sejarah
