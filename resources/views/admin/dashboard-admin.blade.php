@@ -2284,7 +2284,8 @@
             const status = document.getElementById('filterStatusBerkas')?.value || 'Semua';
 
             const data = getPendaftar().filter(p => {
-                if (p.statusBerkas !== 'Terkirim' && !['Belum Valid', 'Ditolak', 'Disetujui'].includes(p.statusBerkasAdmin)) return false;
+                // Munculkan di tab berkas jika formulir sudah terkirim, tidak peduli status berkasnya apa
+                if (p.statusFormulir !== 'Terkirim' && !['Belum Valid', 'Ditolak', 'Disetujui'].includes(p.statusBerkasAdmin)) return false;
                 const matchQ = !q || (p.nama || '').toLowerCase().includes(q);
                 const matchJ = jalur === 'Semua' || p.jalur === jalur;
                 const matchS = status === 'Semua' || (p.statusBerkasAdmin || 'Menunggu') === status;
