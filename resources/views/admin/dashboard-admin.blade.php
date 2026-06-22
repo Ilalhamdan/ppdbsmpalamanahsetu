@@ -1966,10 +1966,10 @@
                     'tanggalDaftar'       => $p?->tanggal_daftar
                                               ? \Carbon\Carbon::parse($p->tanggal_daftar)->format('d/m/Y')
                                               : ($p?->created_at ? $p->created_at->format('d/m/Y') : ''),
-                    'statusFormulir'      => $cs->status_formulir ?? 'Belum',
+                    'statusFormulir'      => $cs->status_formulir === 'Terkirim' ? 'Terkirim' : ($p ? 'Terkirim' : 'Belum'),
                     'statusFormulirAdmin' => $p?->status_formulir_admin ?? 'Menunggu',
                     'catatanFormulirAdmin'=> $p?->catatan_formulir_admin ?? '',
-                    'statusBerkas'        => $cs->status_berkas ?? 'Belum',
+                    'statusBerkas'        => $cs->status_berkas === 'Terkirim' ? 'Terkirim' : ($bk ? 'Terkirim' : 'Belum'),
                     'statusBerkasAdmin'   => $p?->status_berkas_admin ?? 'Menunggu',
                     'catatanBerkasAdmin'  => $p?->catatan_berkas_admin ?? '',
                     'statusPembayaran'    => $pb?->status_pembayaran ?? 'Belum Bayar',
