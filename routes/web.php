@@ -28,6 +28,15 @@ Route::get('/run-migration', function () {
     }
 });
 
+Route::get('/reset-db', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
+        return response('Database berhasil direset ke kondisi awal (termasuk akun admin & seeder)! Output: <br>' . nl2br(\Illuminate\Support\Facades\Artisan::output()));
+    } catch (\Exception $e) {
+        return response('Reset Database gagal: ' . $e->getMessage());
+    }
+});
+
 // 2. Rute Navigasi Menu Profil Sekolah (Mendukung Tab Sejarah, Visi-Misi, Fasilitas, Ekstrakurikuler, Prestasi)
 Route::get('/profil', function () {
     return view('profil', ['tab' => 'sejarah']); // Standar awal membuka sejarah

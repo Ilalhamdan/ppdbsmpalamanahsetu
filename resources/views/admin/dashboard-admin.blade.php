@@ -1978,6 +1978,7 @@
                     'namaPengirim'        => $pb?->nama_pengirim ?? '',
                     'nilaiUjian'          => $p?->nilai_ujian ?? null,
                     'hasilSeleksi'        => $p?->hasil_seleksi ?? '',
+                    'uploadedFiles'       => $uploadedFiles,
                     'formData'            => [
                         'inputNama'              => $cs->user->name ?? '',
                         'inputGender'            => $cs->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
