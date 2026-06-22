@@ -383,11 +383,24 @@ class PendaftaranController extends Controller
         ];
 
         $data = [];
+        $errors = [];
         foreach ($fieldMap as $key => $col) {
+            // Cek apakah form punya field-nya, tapi file-nya tidak ada/tidak valid (misal: melebihi upload_max_filesize)
+            if ($request->has($key) && !$request->hasFile($key)) {
+                $errors[] = "File untuk '$key' gagal diunggah (mungkin ukurannya terlalu besar).";
+            }
             if ($request->hasFile($key)) {
                 $path = $request->file($key)->store('berkas_siswa', 'public');
                 $data[$col] = $path;
             }
+        }
+
+        if (!empty($errors)) {
+            return response()->json(['success' => false, 'message' => implode(' ', $errors)], 400);
+        }
+
+        if (empty($data) && $request->input('submit') !== 'true') {
+            return response()->json(['success' => false, 'message' => 'Tidak ada file valid yang diterima oleh server.'], 400);
         }
 
         if (!empty($data)) {
