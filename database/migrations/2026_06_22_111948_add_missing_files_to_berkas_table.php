@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('berkas', function (Blueprint $table) {
-            $table->string('file_pas_foto')->nullable();
-            $table->string('file_sertifikat_prestasi')->nullable();
-            $table->string('file_surat_hafalan')->nullable();
+            if (!Schema::hasColumn('berkas', 'file_pas_foto')) {
+                $table->string('file_pas_foto')->nullable();
+            }
+            if (!Schema::hasColumn('berkas', 'file_sertifikat_prestasi')) {
+                $table->string('file_sertifikat_prestasi')->nullable();
+            }
+            if (!Schema::hasColumn('berkas', 'file_surat_hafalan')) {
+                $table->string('file_surat_hafalan')->nullable();
+            }
         });
     }
 
@@ -24,7 +30,19 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('berkas', function (Blueprint $table) {
-            $table->dropColumn(['file_pas_foto', 'file_sertifikat_prestasi', 'file_surat_hafalan']);
+            $colsToDrop = [];
+            if (Schema::hasColumn('berkas', 'file_pas_foto')) {
+                $colsToDrop[] = 'file_pas_foto';
+            }
+            if (Schema::hasColumn('berkas', 'file_sertifikat_prestasi')) {
+                $colsToDrop[] = 'file_sertifikat_prestasi';
+            }
+            if (Schema::hasColumn('berkas', 'file_surat_hafalan')) {
+                $colsToDrop[] = 'file_surat_hafalan';
+            }
+            if (!empty($colsToDrop)) {
+                $table->dropColumn($colsToDrop);
+            }
         });
     }
 };
