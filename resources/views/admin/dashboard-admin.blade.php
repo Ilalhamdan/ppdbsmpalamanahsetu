@@ -1936,34 +1936,37 @@
 
         // ===== DATA PENDAFTAR: Dibaca dari PHP (database MySQL), bukan localStorage =====
         // Setiap record mewakili satu calon siswa beserta status pendaftarannya
-        const DB_PENDAFTAR = @json(($pendaftar ?? collect())->map(function($cs) {
-            $p = $cs->pendaftaran;
-            $pb = $p?->pembayaran;
-            return [
-                'id'                  => (string) $cs->user_id,
-                'calonSiswaId'        => (string) $cs->id,
-                'nama'                => $cs->user->name ?? '',
-                'email'               => $cs->user->email ?? '',
-                'jalur'               => $p?->jurusan_pilihan ?? '',
-                'noUrut'              => $p?->no_pendaftaran ?? '',
-                'tanggalDaftar'       => $p?->tanggal_daftar
-                                          ? \Carbon\Carbon::parse($p->tanggal_daftar)->format('d/m/Y')
-                                          : ($p?->created_at ? $p->created_at->format('d/m/Y') : ''),
-                'statusFormulir'      => $cs->status_formulir ?? 'Belum',
-                'statusFormulirAdmin' => $p?->status_formulir_admin ?? 'Menunggu',
-                'catatanFormulirAdmin'=> $p?->catatan_formulir_admin ?? '',
-                'statusBerkas'        => $cs->status_berkas ?? 'Belum',
-                'statusBerkasAdmin'   => $p?->status_berkas_admin ?? 'Menunggu',
-                'catatanBerkasAdmin'  => $p?->catatan_berkas_admin ?? '',
-                'statusPembayaran'    => $pb?->status_pembayaran ?? 'Belum Bayar',
-                'catatanPembayaran'   => $pb?->catatan_pembayaran ?? '',
-                'buktiTransferManual' => $pb?->bukti_transfer_manual ?? '',
-                'namaPengirim'        => $pb?->nama_pengirim ?? '',
-                'nilaiUjian'          => $p?->nilai_ujian ?? null,
-                'hasilSeleksi'        => $p?->hasil_seleksi ?? '',
-                'formData'            => [],
-            ];
-        })->values());
+        @php
+            $formattedPendaftar = ($pendaftar ?? collect())->map(function($cs) {
+                $p = $cs->pendaftaran;
+                $pb = $p?->pembayaran;
+                return [
+                    'id'                  => (string) $cs->user_id,
+                    'calonSiswaId'        => (string) $cs->id,
+                    'nama'                => $cs->user->name ?? '',
+                    'email'               => $cs->user->email ?? '',
+                    'jalur'               => $p?->jurusan_pilihan ?? '',
+                    'noUrut'              => $p?->no_pendaftaran ?? '',
+                    'tanggalDaftar'       => $p?->tanggal_daftar
+                                              ? \Carbon\Carbon::parse($p->tanggal_daftar)->format('d/m/Y')
+                                              : ($p?->created_at ? $p->created_at->format('d/m/Y') : ''),
+                    'statusFormulir'      => $cs->status_formulir ?? 'Belum',
+                    'statusFormulirAdmin' => $p?->status_formulir_admin ?? 'Menunggu',
+                    'catatanFormulirAdmin'=> $p?->catatan_formulir_admin ?? '',
+                    'statusBerkas'        => $cs->status_berkas ?? 'Belum',
+                    'statusBerkasAdmin'   => $p?->status_berkas_admin ?? 'Menunggu',
+                    'catatanBerkasAdmin'  => $p?->catatan_berkas_admin ?? '',
+                    'statusPembayaran'    => $pb?->status_pembayaran ?? 'Belum Bayar',
+                    'catatanPembayaran'   => $pb?->catatan_pembayaran ?? '',
+                    'buktiTransferManual' => $pb?->bukti_transfer_manual ?? '',
+                    'namaPengirim'        => $pb?->nama_pengirim ?? '',
+                    'nilaiUjian'          => $p?->nilai_ujian ?? null,
+                    'hasilSeleksi'        => $p?->hasil_seleksi ?? '',
+                    'formData'            => [],
+                ];
+            })->values();
+        @endphp
+        const DB_PENDAFTAR = @json($formattedPendaftar);
 
         // Override lokal: menyimpan perubahan status yang dilakukan admin di sesi ini
         // (sebelum halaman di-refresh). Key = user_id
