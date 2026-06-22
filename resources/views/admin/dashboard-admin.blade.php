@@ -1940,6 +1940,22 @@
             $formattedPendaftar = ($pendaftar ?? collect())->map(function($cs) {
                 $p = $cs->pendaftaran;
                 $pb = $p?->pembayaran;
+                $bk = $p?->berkas;
+                $ortu = $cs->dataOrangtua;
+
+                $uploadedFiles = [];
+                if ($bk) {
+                    if ($bk->file_kartu_keluarga) $uploadedFiles['KK'] = asset('storage/' . $bk->file_kartu_keluarga);
+                    if ($bk->file_akta_kelahiran) $uploadedFiles['Akta'] = asset('storage/' . $bk->file_akta_kelahiran);
+                    if ($bk->file_ijazah_rapor) $uploadedFiles['Rapor'] = asset('storage/' . $bk->file_ijazah_rapor);
+                    if ($bk->file_pas_foto) $uploadedFiles['Foto'] = asset('storage/' . $bk->file_pas_foto);
+                    if ($bk->file_sertifikat_prestasi) $uploadedFiles['Sertifikat'] = asset('storage/' . $bk->file_sertifikat_prestasi);
+                    if ($bk->file_surat_hafalan) $uploadedFiles['KetHafalan'] = asset('storage/' . $bk->file_surat_hafalan);
+                }
+                if ($pb && $pb->bukti_transfer_manual) {
+                    $uploadedFiles['BuktiTransfer'] = asset('storage/' . $pb->bukti_transfer_manual);
+                }
+
                 return [
                     'id'                  => (string) $cs->user_id,
                     'calonSiswaId'        => (string) $cs->id,
@@ -1962,7 +1978,45 @@
                     'namaPengirim'        => $pb?->nama_pengirim ?? '',
                     'nilaiUjian'          => $p?->nilai_ujian ?? null,
                     'hasilSeleksi'        => $p?->hasil_seleksi ?? '',
-                    'formData'            => [],
+                    'formData'            => [
+                        'inputNama'              => $cs->user->name ?? '',
+                        'inputGender'            => $cs->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+                        'inputTinggiBadan'       => $cs->tinggi_badan,
+                        'inputGolDarah'          => $cs->gol_darah,
+                        'inputTempatLahir'       => $cs->tempat_lahir,
+                        'inputTanggalLahir'      => $cs->tanggal_lahir,
+                        'inputAgama'             => $cs->agama,
+                        'inputAnakKe'            => $cs->anak_ke,
+                        'inputJumlahSaudara'     => $cs->jumlah_saudara,
+                        'inputSaudaraLaki'       => $cs->saudara_laki,
+                        'inputSaudaraPerempuan'  => $cs->saudara_perempuan,
+                        'inputSaudaraMenikah'    => $cs->saudara_menikah,
+                        'inputAlamatJalan'       => $cs->alamat_jalan,
+                        'inputAlamatRTRW'        => $cs->alamat_rt_rw,
+                        'inputAlamatDesa'        => $cs->alamat_desa,
+                        'inputAlamatKecamatan'   => $cs->alamat_kecamatan,
+                        'inputAlamatKabupaten'   => $cs->alamat_kabupaten,
+                        'inputNoHpSiswa'         => $cs->no_hp_siswa,
+                        'inputAsalSekolah'       => $cs->asal_sekolah,
+                        'inputAlamatSekolah'     => $cs->alamat_sekolah,
+                        'inputNISN'              => $cs->nisn,
+                        'inputNIK'               => $cs->nik,
+                        'inputNamaAyah'          => $ortu->nama_ayah ?? '',
+                        'inputStatusAyah'        => $ortu->status_ayah ?? '',
+                        'inputNamaIbu'           => $ortu->nama_ibu ?? '',
+                        'inputStatusIbu'         => $ortu->status_ibu ?? '',
+                        'inputPendidikanAyah'    => $ortu->pendidikan_ayah ?? '',
+                        'inputPendidikanIbu'     => $ortu->pendidikan_ibu ?? '',
+                        'inputAlamatOrtu'        => $ortu->alamat_ortu ?? '',
+                        'inputNoHpOrtu'          => $ortu->no_hp_ayah ?? '',
+                        'inputPekerjaanAyah'     => $ortu->pekerjaan_ayah ?? '',
+                        'inputPekerjaanIbu'      => $ortu->pekerjaan_ibu ?? '',
+                        'inputNamaWali'          => $ortu->nama_wali ?? '',
+                        'inputAlamatWali'        => $ortu->alamat_wali ?? '',
+                        'inputNoHpWali'          => $ortu->no_hp_wali ?? '',
+                        'inputPekerjaanWali'     => $ortu->pekerjaan_wali ?? '',
+                    ],
+                    'uploadedFiles'       => $uploadedFiles,
                 ];
             })->values();
         @endphp

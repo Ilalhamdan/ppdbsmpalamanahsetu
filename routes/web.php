@@ -99,6 +99,7 @@ Route::get('/admin/dashboard', function () {
         'user',
         'pendaftaran.pembayaran',
         'pendaftaran.berkas',
+        'dataOrangtua'
     ])->whereHas('user', fn($q) => $q->where('role', 'siswa'))
       ->orderBy('created_at', 'desc')
       ->get();
