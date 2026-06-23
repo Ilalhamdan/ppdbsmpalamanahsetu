@@ -92,11 +92,34 @@ Route::get('/dashboard', function () {
     $dbCatatanPembayaran = null;
     $dbBuktiTransferManual = null;
     $dbNamaPengirim = null;
+    // Status verifikasi formulir & berkas dari DB
+    $dbStatusFormulir = null;
+    $dbStatusFormulirAdmin = null;
+    $dbCatatanFormulirAdmin = null;
+    $dbStatusBerkas = null;
+    $dbStatusBerkasAdmin = null;
+    $dbCatatanBerkasAdmin = null;
+    $dbNilaiUjian = null;
+    $dbHasilSeleksi = null;
+    $dbJalur = null;
+    $dbNoUrut = null;
+    $dbTanggalDaftar = null;
     if ($siswa) {
         $calon = \App\Models\CalonSiswa::where('user_id', $siswa->id)->first();
         if ($calon) {
+            $dbStatusFormulir = $calon->status_formulir;
+            $dbStatusBerkas = $calon->status_berkas;
             $pendaftaran = \App\Models\Pendaftaran::where('calon_siswa_id', $calon->id)->first();
             if ($pendaftaran) {
+                $dbStatusFormulirAdmin = $pendaftaran->status_formulir_admin;
+                $dbCatatanFormulirAdmin = $pendaftaran->catatan_formulir_admin;
+                $dbStatusBerkasAdmin = $pendaftaran->status_berkas_admin;
+                $dbCatatanBerkasAdmin = $pendaftaran->catatan_berkas_admin;
+                $dbNilaiUjian = $pendaftaran->nilai_ujian;
+                $dbHasilSeleksi = $pendaftaran->hasil_seleksi;
+                $dbJalur = $pendaftaran->jurusan_pilihan;
+                $dbNoUrut = $pendaftaran->no_pendaftaran;
+                $dbTanggalDaftar = $pendaftaran->created_at ? $pendaftaran->created_at->format('d/m/Y') : null;
                 $pembayaran = \App\Models\Pembayaran::where('pendaftaran_id', $pendaftaran->id)->first();
                 if ($pembayaran) {
                     $dbStatusPembayaran = $pembayaran->status_pembayaran;
@@ -108,7 +131,13 @@ Route::get('/dashboard', function () {
         }
     }
     
-    return view('siswa.dashboard-siswa', compact('siswa', 'dbStatusPembayaran', 'dbCatatanPembayaran', 'dbBuktiTransferManual', 'dbNamaPengirim'));
+    return view('siswa.dashboard-siswa', compact(
+        'siswa', 
+        'dbStatusPembayaran', 'dbCatatanPembayaran', 'dbBuktiTransferManual', 'dbNamaPengirim',
+        'dbStatusFormulir', 'dbStatusFormulirAdmin', 'dbCatatanFormulirAdmin',
+        'dbStatusBerkas', 'dbStatusBerkasAdmin', 'dbCatatanBerkasAdmin',
+        'dbNilaiUjian', 'dbHasilSeleksi', 'dbJalur', 'dbNoUrut', 'dbTanggalDaftar'
+    ));
 })->middleware(['auth'])->name('dashboard');
 
 // 5b. Dashboard Admin - Hanya untuk user dengan role 'admin'

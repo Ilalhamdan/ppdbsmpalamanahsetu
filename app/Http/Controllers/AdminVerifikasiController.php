@@ -23,6 +23,9 @@ class AdminVerifikasiController extends Controller
             'catatan_formulir_admin' => null,
         ]);
 
+        // Auto-update status pendaftaran jika formulir DAN berkas sudah disetujui
+        $this->checkAndUpdateStatusPendaftaran($pendaftaran);
+
         return response()->json(['success' => true, 'message' => 'Formulir berhasil disetujui.']);
     }
 
@@ -56,6 +59,9 @@ class AdminVerifikasiController extends Controller
             'status_berkas_admin' => 'Disetujui',
             'catatan_berkas_admin' => null,
         ]);
+
+        // Auto-update status pendaftaran jika formulir DAN berkas sudah disetujui
+        $this->checkAndUpdateStatusPendaftaran($pendaftaran);
 
         return response()->json(['success' => true, 'message' => 'Berkas berhasil disetujui.']);
     }
@@ -106,5 +112,17 @@ class AdminVerifikasiController extends Controller
         $calonSiswa = CalonSiswa::where('user_id', $userId)->first();
         if (!$calonSiswa) return null;
         return Pendaftaran::where('calon_siswa_id', $calonSiswa->id)->first();
+    }
+
+    /**
+     * Cek apakah formulir DAN berkas sudah disetujui.
+     * Jika iya, otomatis ubah status_pendaftaran menjadi 'Selesai'.
+     */
+    private function checkAndUpdateStatusPendaftaran(Pendaftaran $pendaftaran)
+    {
+        $pendaftaran->refresh();
+        if ($pendaftaran->status_formulir_admin === 'Disetujui' && $pendaftaran->status_berkas_admin === 'Disetujui') {
+            $pendaftaran->update(['status_pendaftaran' => 'Selesai']);
+        }
     }
 }

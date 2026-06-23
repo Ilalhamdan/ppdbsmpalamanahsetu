@@ -2850,18 +2850,84 @@
         const DB_BUKTI_TRANSFER_MANUAL = {!! json_encode($dbBuktiTransferManual ?? '') !!};
         const DB_NAMA_PENGIRIM = {!! json_encode($dbNamaPengirim ?? '') !!};
 
-        if (DB_STATUS_PEMBAYARAN) {
-            let mappedStatus = 'Belum Bayar';
-            if (DB_STATUS_PEMBAYARAN === 'Menunggu Verifikasi') mappedStatus = 'Menunggu Konfirmasi';
-            else if (DB_STATUS_PEMBAYARAN === 'Lunas') mappedStatus = 'Lunas';
+        // Synchronize with Real DB Formulir & Berkas Verification Status
+        const DB_STATUS_FORMULIR = '{{ $dbStatusFormulir ?? "" }}';
+        const DB_STATUS_FORMULIR_ADMIN = '{{ $dbStatusFormulirAdmin ?? "" }}';
+        const DB_CATATAN_FORMULIR_ADMIN = {!! json_encode($dbCatatanFormulirAdmin ?? '') !!};
+        const DB_STATUS_BERKAS = '{{ $dbStatusBerkas ?? "" }}';
+        const DB_STATUS_BERKAS_ADMIN = '{{ $dbStatusBerkasAdmin ?? "" }}';
+        const DB_CATATAN_BERKAS_ADMIN = {!! json_encode($dbCatatanBerkasAdmin ?? '') !!};
+        const DB_NILAI_UJIAN = {!! json_encode($dbNilaiUjian ?? null) !!};
+        const DB_HASIL_SELEKSI = '{{ $dbHasilSeleksi ?? "" }}';
+        const DB_JALUR = '{{ $dbJalur ?? "" }}';
+        const DB_NO_URUT = '{{ $dbNoUrut ?? "" }}';
+        const DB_TANGGAL_DAFTAR = '{{ $dbTanggalDaftar ?? "" }}';
 
+        // Sync ALL statuses from DB into localStorage on page load
+        (function syncAllFromDB() {
             let currentState = {};
             try { currentState = JSON.parse(localStorage.getItem(STATE_KEY)) || {}; } catch (e) { }
 
             let changed = false;
-            if (currentState.statusPembayaran !== mappedStatus) {
-                currentState.statusPembayaran = mappedStatus;
+
+            // Sync formulir & berkas statuses from DB
+            if (DB_STATUS_FORMULIR && currentState.statusFormulir !== DB_STATUS_FORMULIR) {
+                currentState.statusFormulir = DB_STATUS_FORMULIR;
                 changed = true;
+            }
+            if (DB_STATUS_FORMULIR_ADMIN && currentState.statusFormulirAdmin !== DB_STATUS_FORMULIR_ADMIN) {
+                currentState.statusFormulirAdmin = DB_STATUS_FORMULIR_ADMIN;
+                changed = true;
+            }
+            if (DB_CATATAN_FORMULIR_ADMIN !== undefined && currentState.catatanFormulirAdmin !== DB_CATATAN_FORMULIR_ADMIN) {
+                currentState.catatanFormulirAdmin = DB_CATATAN_FORMULIR_ADMIN;
+                changed = true;
+            }
+            if (DB_STATUS_BERKAS && currentState.statusBerkas !== DB_STATUS_BERKAS) {
+                currentState.statusBerkas = DB_STATUS_BERKAS;
+                changed = true;
+            }
+            if (DB_STATUS_BERKAS_ADMIN && currentState.statusBerkasAdmin !== DB_STATUS_BERKAS_ADMIN) {
+                currentState.statusBerkasAdmin = DB_STATUS_BERKAS_ADMIN;
+                changed = true;
+            }
+            if (DB_CATATAN_BERKAS_ADMIN !== undefined && currentState.catatanBerkasAdmin !== DB_CATATAN_BERKAS_ADMIN) {
+                currentState.catatanBerkasAdmin = DB_CATATAN_BERKAS_ADMIN;
+                changed = true;
+            }
+            // Sync nilai ujian & hasil seleksi
+            if (DB_NILAI_UJIAN !== null && currentState.nilaiUjian !== DB_NILAI_UJIAN) {
+                currentState.nilaiUjian = DB_NILAI_UJIAN;
+                changed = true;
+            }
+            if (DB_HASIL_SELEKSI && currentState.hasilSeleksi !== DB_HASIL_SELEKSI) {
+                currentState.hasilSeleksi = DB_HASIL_SELEKSI;
+                changed = true;
+            }
+            // Sync jalur, noUrut, tanggalDaftar
+            if (DB_JALUR && currentState.jalur !== DB_JALUR) {
+                currentState.jalur = DB_JALUR;
+                changed = true;
+            }
+            if (DB_NO_URUT && currentState.noUrut !== DB_NO_URUT) {
+                currentState.noUrut = DB_NO_URUT;
+                changed = true;
+            }
+            if (DB_TANGGAL_DAFTAR && currentState.tanggalDaftar !== DB_TANGGAL_DAFTAR) {
+                currentState.tanggalDaftar = DB_TANGGAL_DAFTAR;
+                changed = true;
+            }
+
+            // Sync payment status
+            if (DB_STATUS_PEMBAYARAN) {
+                let mappedStatus = 'Belum Bayar';
+                if (DB_STATUS_PEMBAYARAN === 'Menunggu Verifikasi') mappedStatus = 'Menunggu Konfirmasi';
+                else if (DB_STATUS_PEMBAYARAN === 'Lunas') mappedStatus = 'Lunas';
+
+                if (currentState.statusPembayaran !== mappedStatus) {
+                    currentState.statusPembayaran = mappedStatus;
+                    changed = true;
+                }
             }
             if (currentState.catatanPembayaran !== DB_CATATAN_PEMBAYARAN) {
                 currentState.catatanPembayaran = DB_CATATAN_PEMBAYARAN;
@@ -2885,15 +2951,21 @@
                 if (adminState.pendaftar) {
                     const p = adminState.pendaftar.find(x => x.id === SISWA_ID);
                     if (p) {
-                        p.statusPembayaran = mappedStatus;
-                        p.catatanPembayaran = DB_CATATAN_PEMBAYARAN;
-                        p.buktiTransferManual = DB_BUKTI_TRANSFER_MANUAL;
-                        p.namaPengirim = DB_NAMA_PENGIRIM;
+                        p.statusFormulirAdmin = currentState.statusFormulirAdmin;
+                        p.catatanFormulirAdmin = currentState.catatanFormulirAdmin;
+                        p.statusBerkasAdmin = currentState.statusBerkasAdmin;
+                        p.catatanBerkasAdmin = currentState.catatanBerkasAdmin;
+                        p.statusPembayaran = currentState.statusPembayaran;
+                        p.catatanPembayaran = currentState.catatanPembayaran;
+                        p.buktiTransferManual = currentState.buktiTransferManual;
+                        p.namaPengirim = currentState.namaPengirim;
+                        p.nilaiUjian = currentState.nilaiUjian;
+                        p.hasilSeleksi = currentState.hasilSeleksi;
                         localStorage.setItem(ADMIN_STATE_KEY, JSON.stringify(adminState));
                     }
                 }
             }
-        }
+        })();
 
         // IndexedDB File Store Helpers
         const DB_NAME = 'PPDBFileStore';
@@ -4367,6 +4439,79 @@
         }
 
         function pollAdminDecisions() {
+            // PRIORITY 1: Poll from the server database (real-time cross-browser sync)
+            fetch('{{ route("pendaftaran.data") }}', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                const state = getState();
+                let changed = false;
+
+                // Check formulir admin decision from server
+                if (data.statusFormulirAdmin && data.statusFormulirAdmin !== state.statusFormulirAdmin) {
+                    setState({ statusFormulirAdmin: data.statusFormulirAdmin, catatanFormulirAdmin: data.catatanFormulirAdmin || '' });
+                    changed = true;
+                    if (data.statusFormulirAdmin === 'Disetujui') {
+                        addNotif({ tipe: 'formulir_disetujui', pesan: 'Formulir pendaftaran Anda telah DISETUJUI oleh Panitia PPDB! Silakan upload berkas.', emoji: '<i class="bi bi-check-circle-fill text-success"></i>' });
+                    } else if (data.statusFormulirAdmin === 'Perlu Revisi' || data.statusFormulirAdmin === 'Belum Valid' || data.statusFormulirAdmin === 'Ditolak') {
+                        const label = data.statusFormulirAdmin === 'Ditolak' ? 'DITOLAK' : 'BELUM VALID';
+                        addNotif({ tipe: 'formulir_ditolak', pesan: 'Formulir Anda ditandai ' + label + ': ' + (data.catatanFormulirAdmin || 'Silakan cek catatan admin.'), emoji: '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' });
+                    }
+                }
+
+                // Check berkas admin decision from server
+                if (data.statusBerkasAdmin && data.statusBerkasAdmin !== state.statusBerkasAdmin) {
+                    setState({ statusBerkasAdmin: data.statusBerkasAdmin, catatanBerkasAdmin: data.catatanBerkasAdmin || '' });
+                    changed = true;
+                    if (data.statusBerkasAdmin === 'Disetujui') {
+                        addNotif({ tipe: 'berkas_disetujui', pesan: 'Berkas Anda telah DISETUJUI! Akses cetak kartu ujian kini terbuka.', emoji: '<i class="bi bi-patch-check-fill text-success"></i>' });
+                    } else if (data.statusBerkasAdmin === 'Perlu Revisi' || data.statusBerkasAdmin === 'Belum Valid' || data.statusBerkasAdmin === 'Ditolak') {
+                        const label = data.statusBerkasAdmin === 'Ditolak' ? 'DITOLAK' : 'BELUM VALID';
+                        addNotif({ tipe: 'berkas_ditolak', pesan: 'Berkas Anda ditandai ' + label + ': ' + (data.catatanBerkasAdmin || 'Silakan cek catatan admin.'), emoji: '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' });
+                    }
+                }
+
+                // Check hasil seleksi from server
+                if (data.hasilSeleksi !== undefined && data.hasilSeleksi !== '' && data.hasilSeleksi !== state.hasilSeleksi) {
+                    setState({ hasilSeleksi: data.hasilSeleksi || '' });
+                    changed = true;
+                    if (data.hasilSeleksi === 'Lulus') {
+                        addNotif({ tipe: 'hasil_seleksi', pesan: 'Selamat! Anda dinyatakan LULUS seleksi PPDB SMP Al-Amanah.', emoji: '<i class="bi bi-patch-check-fill text-success"></i>' });
+                    } else if (data.hasilSeleksi === 'Tidak Lulus') {
+                        addNotif({ tipe: 'hasil_seleksi', pesan: 'Mohon maaf, Anda dinyatakan TIDAK LULUS seleksi PPDB SMP Al-Amanah.', emoji: '<i class="bi bi-x-circle-fill text-danger"></i>' });
+                    }
+                }
+
+                // Check nilai ujian from server
+                const nilaiServer = data.nilaiUjian !== undefined ? data.nilaiUjian : null;
+                const nilaiServerStr = JSON.stringify(nilaiServer);
+                const nilaiStateStr = JSON.stringify(state.nilaiUjian || null);
+                if (nilaiServerStr !== nilaiStateStr && nilaiServer !== null) {
+                    setState({ nilaiUjian: nilaiServer });
+                    changed = true;
+                    addNotif({ tipe: 'nilai_ujian', pesan: 'Nilai ujian masuk Anda telah dipublikasikan oleh panitia.', emoji: '<i class="bi bi-journal-check text-teal"></i>' });
+                }
+
+                if (changed) {
+                    syncToAdminPanel();
+                    updateDashboardUI();
+                }
+            })
+            .catch(err => {
+                // Fallback: poll from localStorage (for same-browser admin/siswa demo)
+                pollAdminDecisionsFromLocalStorage();
+            });
+        }
+
+        // Fallback localStorage polling (for demo/testing on same browser)
+        function pollAdminDecisionsFromLocalStorage() {
             let adminState = {};
             try { adminState = JSON.parse(localStorage.getItem(ADMIN_STATE_KEY)) || {}; } catch (e) { return; }
 
@@ -4838,7 +4983,7 @@
             loadBerkasFromIndexedDB();
 
             // Poll admin decisions every 3 seconds
-            setInterval(() => { pollAdminDecisions(); }, 3000);
+            setInterval(() => { pollAdminDecisions(); }, 5000);
         });
     </script>
 
